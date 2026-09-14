@@ -1,0 +1,297 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>QR Attendance System</title>
+  
+  <!-- Open-Source QR Scanner Engine -->
+  <script src="https://unpkg.com/html5-qrcode"></script>
+
+  <style>
+    :root {
+      --primary: #1e3a8a;
+      --success: #15803d;
+      --error: #b91c1c;
+      --bg: #f8fafc;
+      --card-bg: #ffffff;
+      --text: #0f172a;
+    }
+
+    * {
+      box-sizing: border-box;
+      margin: 0;
+      padding: 0;
+      font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Oxygen, Ubuntu, Cantarell, sans-serif;
+    }
+
+    body {
+      background-color: var(--bg);
+      color: var(--text);
+      display: flex;
+      justify-content: center;
+      align-items: flex-start;
+      min-height: 100vh;
+      padding: 16px;
+    }
+
+    .container {
+      width: 100%;
+      max-width: 480px;
+      background: var(--card-bg);
+      padding: 20px;
+      border-radius: 12px;
+      box-shadow: 0 4px 12px rgba(0, 0, 0, 0.08);
+    }
+
+    h1 {
+      font-size: 1.25rem;
+      text-align: center;
+      margin-bottom: 12px;
+      color: var(--primary);
+    }
+
+    .form-group {
+      margin-bottom: 14px;
+    }
+
+    label {
+      font-size: 0.85rem;
+      font-weight: 600;
+      margin-bottom: 4px;
+      display: block;
+    }
+
+    select, button {
+      width: 100%;
+      padding: 10px;
+      border-radius: 8px;
+      border: 1px solid #cbd5e1;
+      font-size: 0.95rem;
+    }
+
+    button {
+      background: var(--primary);
+      color: white;
+      border: none;
+      font-weight: 600;
+      cursor: pointer;
+      margin-top: 8px;
+      transition: opacity 0.2s;
+    }
+
+    button:disabled {
+      opacity: 0.6;
+      cursor: not-allowed;
+    }
+
+    #reader {
+      width: 100%;
+      border-radius: 8px;
+      overflow: hidden;
+      margin-top: 10px;
+      border: 1px dashed #94a3b8;
+    }
+
+    .status-card {
+      margin-top: 16px;
+      padding: 12px;
+      border-radius: 8px;
+      font-size: 0.9rem;
+      display: none;
+    }
+
+    .status-success {
+      background-color: #dcfce7;
+      border: 1px solid var(--success);
+      color: var(--success);
+      display: block;
+    }
+
+    .status-error {
+      background-color: #fee2e2;
+      border: 1px solid var(--error);
+      color: var(--error);
+      display: block;
+    }
+
+    .student-details {
+      margin-top: 6px;
+      font-size: 0.85rem;
+      line-height: 1.4;
+      color: #334155;
+    }
+
+    .log-list {
+      margin-top: 16px;
+      border-top: 1px solid #e2e8f0;
+      padding-top: 10px;
+      font-size: 0.8rem;
+    }
+
+    .log-item {
+      padding: 6px 0;
+      border-bottom: 1px solid #f1f5f9;
+      display: flex;
+      justify-content: space-between;
+    }
+  </style>
+</head>
+<body>
+
+<div class="container">
+  <h1>Attendance Checking System</h1>
+
+  <div class="form-group">
+    <label for="sessionType">Scan Mode / Session</label>
+    <select id="sessionType">
+      <option value="AM Time-In">AM Time-In</option>
+      <option value="AM Time-Out">AM Time-Out</option>
+      <option value="PM Time-In">PM Time-In</option>
+      <option value="PM Time-Out">PM Time-Out</option>
+    </select>
+  </div>
+
+  <button id="toggleCameraBtn">Start Camera Scanner</button>
+
+  <div id="reader"></div>
+
+  <div id="statusBox" class="status-card">
+    <strong id="statusTitle"></strong>
+    <div id="statusBody" class="student-details"></div>
+  </div>
+
+  <div class="log-list">
+    <label>Recent Scans (This Session)</label>
+    <div id="recentScans"></div>
+  </div>
+</div>
+
+<script>
+  // INSERT YOUR GOOGLE APPS SCRIPT WEB APP URL HERE:
+  const SCRIPT_URL = "https://script.google.com/macros/s/AKfycbzAtKIZZKMPgxTWW5ZSUZV6xSLlUvOEgMmvzF5HFSweel1bIxXqZT6JvwzlligfPCq8/exec";
+
+  let html5QrCode = null;
+  let isScanning = false;
+  let isProcessing = false;
+
+  const toggleBtn = document.getElementById("toggleCameraBtn");
+  const statusBox = document.getElementById("statusBox");
+  const statusTitle = document.getElementById("statusTitle");
+  const statusBody = document.getElementById("statusBody");
+  const recentScans = document.getElementById("recentScans");
+  const sessionTypeSelect = document.getElementById("sessionType");
+
+  // Format Helpers
+  function getFormattedDate(d) {
+    const yyyy = d.getFullYear();
+    const mm = String(d.getMonth() + 1).padStart(2, '0');
+    const dd = String(d.getDate()).padStart(2, '0');
+    return `${yyyy}/${mm}/${dd}`;
+  }
+
+  function getFormattedTime(d) {
+    const hh = String(d.getHours()).padStart(2, '0');
+    const min = String(d.getMinutes()).padStart(2, '0');
+    const ss = String(d.getSeconds()).padStart(2, '0');
+    return `${hh}:${min}:${ss}`;
+  }
+
+  // Handle Successful Scan
+  async function onScanSuccess(decodedText) {
+    if (isProcessing) return;
+    isProcessing = true;
+
+    const studentNumber = decodedText.trim();
+    const now = new Date();
+    const dateStr = getFormattedDate(now);
+    const timeStr = getFormattedTime(now);
+    const session = sessionTypeSelect.value;
+
+    showStatus("Processing...", `Verifying: ${studentNumber}`, "neutral");
+
+    try {
+      const payload = {
+        studentNumber: studentNumber,
+        sessionType: session,
+        date: dateStr,
+        time: timeStr
+      };
+
+      const response = await fetch(SCRIPT_URL, {
+        method: "POST",
+        mode: "cors",
+        headers: { "Content-Type": "text/plain;charset=utf-8" },
+        body: JSON.stringify(payload)
+      });
+
+      const result = await response.json();
+
+      if (result.status === "success") {
+        const s = result.student;
+        showStatus(
+          "Recorded Successfully!",
+          `<strong>${s.fullName}</strong><br>ID: ${s.studentNumber}<br>Course & Year: ${s.program} - ${s.year}<br>Time: [${dateStr}] ${timeStr} (${session})`,
+          "success"
+        );
+        addRecentLog(s.fullName, studentNumber, timeStr);
+      } else {
+        showStatus(
+          "Validation Failed",
+          result.message || "Student Number not recognized.",
+          "error"
+        );
+      }
+    } catch (err) {
+      showStatus("Connection Error", "Check internet or Google Sheet script deployment.", "error");
+    } finally {
+      // Delay to avoid double-reading the same QR code immediately
+      setTimeout(() => { isProcessing = false; }, 2500);
+    }
+  }
+
+  function showStatus(title, message, type) {
+    statusBox.className = "status-card";
+    if (type === "success") statusBox.classList.add("status-success");
+    else if (type === "error") statusBox.classList.add("status-error");
+    else {
+      statusBox.style.display = "block";
+      statusBox.style.background = "#e2e8f0";
+      statusBox.style.color = "#1e293b";
+    }
+
+    statusTitle.innerHTML = title;
+    statusBody.innerHTML = message;
+  }
+
+  function addRecentLog(name, id, time) {
+    const div = document.createElement("div");
+    div.className = "log-item";
+    div.innerHTML = `<span><strong>${name}</strong> (${id})</span><span>${time}</span>`;
+    recentScans.prepend(div);
+  }
+
+  // Camera Management
+  toggleBtn.addEventListener("click", () => {
+    if (isScanning) {
+      html5QrCode.stop().then(() => {
+        isScanning = false;
+        toggleBtn.innerText = "Start Camera Scanner";
+      });
+    } else {
+      html5QrCode = new Html5Qrcode("reader");
+      html5QrCode.start(
+        { facingMode: "environment" },
+        { fps: 10, qrbox: { width: 250, height: 250 } },
+        onScanSuccess
+      ).then(() => {
+        isScanning = true;
+        toggleBtn.innerText = "Stop Camera Scanner";
+      }).catch(err => {
+        alert("Camera permission denied or camera not found: " + err);
+      });
+    }
+  });
+</script>
+</body>
+</html>
