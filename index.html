@@ -1,296 +1,1945 @@
 <!DOCTYPE html>
-<html lang="en">
+<html lang="en" data-theme="light">
 <head>
   <meta charset="UTF-8" />
-  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-  <title>QR Attendance System</title>
-  
-  <!-- Open-Source QR Scanner Engine -->
-  <script src="https://unpkg.com/html5-qrcode"></script>
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no" />
+  <title>Engineering Attendance System</title>
+
+  <!-- Free & Open-Source CDNs -->
+  <script src="https://unpkg.com/html5-qrcode@2.3.8/html5-qrcode.min.js"></script>
+  <script src="https://cdn.jsdelivr.net/npm/xlsx@0.18.5/dist/xlsx.full.min.js"></script>
+
+  <!-- Google Font: Inter for clean, modern typography -->
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&display=swap" rel="stylesheet">
 
   <style>
-    :root {
-      --primary: #1e3a8a;
-      --success: #15803d;
-      --error: #b91c1c;
-      --bg: #f8fafc;
-      --card-bg: #ffffff;
-      --text: #0f172a;
+    /* ============================================================
+       LIQUID GLASS DESIGN SYSTEM
+       Light: Peach Silk  |  Dark: Crimson
+       ============================================================ */
+
+    :root[data-theme="light"] {
+      --primary: #b83226;
+      --primary-hover: #d32f2f;
+      --primary-subtle: rgba(184, 50, 38, 0.12);
+      --success: #1e8449;
+      --danger: #c0392b;
+      --warning: #d97706;
+      --background: #f7cebe;
+      --card: rgba(255, 255, 255, 0.48);
+      --card-border: rgba(255, 255, 255, 0.65);
+      --card-shadow: rgba(180, 100, 80, 0.14);
+      --card-inset: rgba(255, 255, 255, 0.5);
+      --text: #2f0808;
+      --text-muted: #724242;
+      --border: rgba(255, 255, 255, 0.55);
+      --th-bg: rgba(255, 235, 220, 0.7);
+      --row-hover: rgba(255, 210, 195, 0.35);
+      --input-bg: rgba(255, 255, 255, 0.55);
+      --chip-bg: rgba(255, 195, 175, 0.55);
+      --glass-blur: blur(18px) saturate(1.5);
+      --glass-blur-sm: blur(10px) saturate(1.3);
+
+      /* Status Banners */
+      --banner-online-bg: rgba(34, 197, 94, 0.18);
+      --banner-online-border: rgba(34, 197, 94, 0.45);
+      --banner-online-text: #14532d;
+      --banner-offline-bg: rgba(234, 179, 8, 0.22);
+      --banner-offline-border: rgba(234, 179, 8, 0.45);
+      --banner-offline-text: #78350f;
+    }
+
+    :root[data-theme="dark"] {
+      --primary: #ff4d6a;
+      --primary-hover: #ff6b81;
+      --primary-subtle: rgba(255, 77, 106, 0.16);
+      --success: #22c55e;
+      --danger: #ef4444;
+      --warning: #f59e0b;
+      --background: #230005;
+      --card: rgba(65, 0, 10, 0.42);
+      --card-border: rgba(255, 70, 90, 0.25);
+      --card-shadow: rgba(0, 0, 0, 0.45);
+      --card-inset: rgba(255, 50, 70, 0.1);
+      --text: #fdf2f2;
+      --text-muted: #d69f9f;
+      --border: rgba(255, 70, 90, 0.22);
+      --th-bg: rgba(70, 0, 10, 0.75);
+      --row-hover: rgba(255, 20, 50, 0.15);
+      --input-bg: rgba(45, 0, 8, 0.6);
+      --chip-bg: rgba(255, 50, 70, 0.2);
+      --glass-blur: blur(20px) saturate(1.4);
+      --glass-blur-sm: blur(10px) saturate(1.2);
+
+      /* Status Banners */
+      --banner-online-bg: rgba(34, 197, 94, 0.2);
+      --banner-online-border: rgba(34, 197, 94, 0.35);
+      --banner-online-text: #86efac;
+      --banner-offline-bg: rgba(234, 179, 8, 0.22);
+      --banner-offline-border: rgba(234, 179, 8, 0.4);
+      --banner-offline-text: #fde047;
     }
 
     * {
       box-sizing: border-box;
-      margin: 0;
-      padding: 0;
-      font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Oxygen, Ubuntu, Cantarell, sans-serif;
+      -webkit-tap-highlight-color: transparent;
+      transition: background-color 0.3s ease, color 0.25s ease, border-color 0.25s ease,
+                  box-shadow 0.25s ease;
     }
 
     body {
-      background-color: var(--bg);
+      font-family: 'Inter', -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif;
+      margin: 0;
+      padding: 12px 10px;
       color: var(--text);
-      display: flex;
-      justify-content: center;
-      align-items: flex-start;
       min-height: 100vh;
-      padding: 16px;
+      background-color: var(--background);
+      background-attachment: fixed;
+    }
+
+    [data-theme="light"] body {
+      background-image:
+        radial-gradient(circle at 13% 32%, rgba(255, 253, 245, 0.95) 0%, rgba(255, 246, 230, 0.7) 12%, rgba(255, 235, 215, 0.3) 25%, transparent 40%),
+        radial-gradient(ellipse 65% 55% at 0% 98%, rgba(255, 98, 98, 0.85) 0%, rgba(255, 128, 122, 0.6) 25%, rgba(250, 165, 155, 0.3) 45%, transparent 65%),
+        radial-gradient(ellipse 65% 55% at 98% 8%, rgba(242, 114, 107, 0.85) 0%, rgba(250, 142, 134, 0.6) 30%, rgba(252, 185, 175, 0.25) 55%, transparent 75%),
+        radial-gradient(ellipse 60% 35% at 15% 0%, rgba(250, 135, 127, 0.75) 0%, rgba(255, 170, 160, 0.4) 40%, transparent 65%),
+        linear-gradient(42deg, transparent 25%, rgba(255, 246, 235, 0.65) 45%, rgba(255, 252, 245, 0.75) 52%, rgba(250, 215, 200, 0.4) 65%, transparent 80%),
+        linear-gradient(135deg, #fba89f 0%, #fbd0bf 25%, #fae0ce 50%, #f6c4b2 75%, #fff3e2 100%);
+    }
+
+    [data-theme="dark"] body {
+      background-image:
+        radial-gradient(ellipse 45% 90% at 85% 30%, rgba(255, 0, 43, 0.95) 0%, rgba(230, 0, 38, 0.75) 30%, rgba(160, 0, 25, 0.4) 55%, transparent 75%),
+        radial-gradient(ellipse 55% 80% at 5% 85%, rgba(255, 5, 45, 0.9) 0%, rgba(215, 0, 35, 0.65) 35%, rgba(140, 0, 20, 0.35) 60%, transparent 80%),
+        radial-gradient(ellipse 60% 40% at 45% 5%, rgba(190, 0, 25, 0.5) 0%, transparent 65%),
+        linear-gradient(140deg, transparent 15%, rgba(175, 0, 25, 0.3) 35%, transparent 50%, rgba(255, 0, 40, 0.4) 75%, transparent 90%),
+        linear-gradient(135deg, #58000d 0%, #380008 30%, #1e0004 60%, #2c0006 100%);
     }
 
     .container {
-      width: 100%;
-      max-width: 480px;
-      background: var(--card-bg);
-      padding: 20px;
-      border-radius: 12px;
-      box-shadow: 0 4px 12px rgba(0, 0, 0, 0.08);
+      max-width: 680px;
+      margin: 0 auto;
+    }
+
+    /* ---- HEADER & CONTROLS ---- */
+    .header-bar {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      margin: 4px 0 10px 0;
+      gap: 8px;
+    }
+
+    .header-left {
+      display: flex;
+      align-items: center;
+      gap: 8px;
     }
 
     h1 {
-      font-size: 1.25rem;
-      text-align: center;
-      margin-bottom: 12px;
+      font-size: 1.12rem;
+      margin: 0;
       color: var(--primary);
+      text-transform: uppercase;
+      letter-spacing: 0.8px;
+      font-weight: 800;
+      display: flex;
+      align-items: center;
+      gap: 6px;
     }
 
-    .form-group {
-      margin-bottom: 14px;
+    .header-actions {
+      display: flex;
+      gap: 6px;
+      align-items: center;
     }
 
-    label {
-      font-size: 0.85rem;
-      font-weight: 600;
-      margin-bottom: 4px;
-      display: block;
-    }
-
-    select, button {
-      width: 100%;
-      padding: 10px;
-      border-radius: 8px;
-      border: 1px solid #cbd5e1;
-      font-size: 0.95rem;
-    }
-
-    button {
-      background: var(--primary);
-      color: white;
-      border: none;
-      font-weight: 600;
+    .pill-btn {
+      background: var(--card);
+      backdrop-filter: var(--glass-blur-sm);
+      -webkit-backdrop-filter: var(--glass-blur-sm);
+      border: 1px solid var(--card-border);
+      color: var(--text);
+      padding: 7px 12px;
+      border-radius: 20px;
       cursor: pointer;
-      margin-top: 8px;
-      transition: opacity 0.2s;
+      font-size: 0.8rem;
+      font-weight: 600;
+      display: inline-flex;
+      align-items: center;
+      gap: 5px;
+      box-shadow: 0 2px 8px var(--card-shadow), inset 0 1px 0 var(--card-inset);
+      transition: transform 0.15s ease, box-shadow 0.2s ease, background-color 0.2s ease;
+      font-family: inherit;
     }
 
-    button:disabled {
-      opacity: 0.6;
-      cursor: not-allowed;
+    .pill-btn:hover {
+      transform: translateY(-1px);
+      box-shadow: 0 4px 14px var(--card-shadow);
+    }
+
+    .pill-btn:active {
+      transform: translateY(0);
+    }
+
+    /* ============================================================
+       ONLINE / OFFLINE STATUS BANNER (Dynamic Background)
+       ============================================================ */
+    .network-banner {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      padding: 9px 14px;
+      border-radius: 12px;
+      font-size: 0.82rem;
+      font-weight: 600;
+      margin-bottom: 12px;
+      backdrop-filter: var(--glass-blur-sm);
+      -webkit-backdrop-filter: var(--glass-blur-sm);
+      transition: all 0.35s ease;
+      box-shadow: 0 2px 10px rgba(0,0,0,0.06);
+    }
+
+    .network-banner.online {
+      background: var(--banner-online-bg);
+      border: 1px solid var(--banner-online-border);
+      color: var(--banner-online-text);
+    }
+
+    .network-banner.offline {
+      background: var(--banner-offline-bg);
+      border: 1px solid var(--banner-offline-border);
+      color: var(--banner-offline-text);
+    }
+
+    .banner-content {
+      display: flex;
+      align-items: center;
+      gap: 8px;
+    }
+
+    .banner-dot {
+      width: 10px;
+      height: 10px;
+      border-radius: 50%;
+      display: inline-block;
+    }
+
+    .network-banner.online .banner-dot {
+      background: #22c55e;
+      box-shadow: 0 0 8px #22c55e;
+    }
+
+    .network-banner.offline .banner-dot {
+      background: #eab308;
+      box-shadow: 0 0 8px #eab308;
+      animation: blink 1.4s infinite;
+    }
+
+    @keyframes blink {
+      0%, 100% { opacity: 1; }
+      50% { opacity: 0.3; }
+    }
+
+    .banner-extra {
+      font-size: 0.74rem;
+      opacity: 0.9;
+    }
+
+    /* ============================================================
+       GLASS CARD
+       ============================================================ */
+    .card {
+      background: var(--card);
+      backdrop-filter: var(--glass-blur);
+      -webkit-backdrop-filter: var(--glass-blur);
+      padding: 16px;
+      border-radius: 18px;
+      box-shadow:
+        0 8px 32px var(--card-shadow),
+        inset 0 1px 0 var(--card-inset);
+      margin-bottom: 14px;
+      border: 1px solid var(--card-border);
+    }
+
+    /* ---- EVENT INPUT ---- */
+    .event-input-row {
+      display: flex;
+      gap: 8px;
+      margin-bottom: 10px;
+    }
+
+    .event-input-row input {
+      flex: 1;
+      padding: 10px 14px;
+      border-radius: 12px;
+      border: 1px solid var(--border);
+      background: var(--input-bg);
+      backdrop-filter: var(--glass-blur-sm);
+      -webkit-backdrop-filter: var(--glass-blur-sm);
+      color: var(--text);
+      font-size: 0.88rem;
+      font-family: inherit;
+    }
+
+    .event-input-row input:focus {
+      outline: none;
+      border-color: var(--primary);
+      box-shadow: 0 0 0 3px var(--primary-subtle);
+    }
+
+    /* ---- 4-MODE ATTENDANCE SWITCHER (AM / PM TIME-IN & TIME-OUT) ---- */
+    .mode-grid {
+      display: grid;
+      grid-template-columns: repeat(4, 1fr);
+      gap: 6px;
+      margin-bottom: 12px;
+    }
+
+    @media (max-width: 480px) {
+      .mode-grid {
+        grid-template-columns: repeat(2, 1fr);
+      }
+    }
+
+    .mode-btn {
+      padding: 10px 6px;
+      font-size: 0.8rem;
+      font-weight: 700;
+      border-radius: 12px;
+      border: 1.5px solid transparent;
+      cursor: pointer;
+      font-family: inherit;
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      justify-content: center;
+      gap: 2px;
+      backdrop-filter: blur(8px);
+      -webkit-backdrop-filter: blur(8px);
+      transition: all 0.2s ease;
+      background: rgba(255, 255, 255, 0.2);
+      color: var(--text-muted);
+    }
+
+    .mode-btn span.mode-sub {
+      font-size: 0.66rem;
+      font-weight: 500;
+      opacity: 0.85;
+      text-transform: uppercase;
+    }
+
+    /* TIME-IN STYLES (Blue) */
+    .mode-btn.in-btn {
+      border-color: rgba(37, 99, 235, 0.3);
+      color: #1d4ed8;
+      background: rgba(37, 99, 235, 0.1);
+    }
+    [data-theme="dark"] .mode-btn.in-btn {
+      color: #93c5fd;
+      background: rgba(59, 130, 246, 0.12);
+      border-color: rgba(59, 130, 246, 0.25);
+    }
+    .mode-btn.in-btn.active {
+      background: linear-gradient(135deg, #2563eb, #1d4ed8);
+      color: #ffffff !important;
+      border-color: #3b82f6;
+      box-shadow: 0 4px 14px rgba(37, 99, 235, 0.4);
+    }
+
+    /* TIME-OUT STYLES (Crimson/Red) */
+    .mode-btn.out-btn {
+      border-color: rgba(220, 38, 38, 0.3);
+      color: #b91c1c;
+      background: rgba(220, 38, 38, 0.1);
+    }
+    [data-theme="dark"] .mode-btn.out-btn {
+      color: #fca5a5;
+      background: rgba(239, 68, 68, 0.12);
+      border-color: rgba(239, 68, 68, 0.25);
+    }
+    .mode-btn.out-btn.active {
+      background: linear-gradient(135deg, #dc2626, #b91c1c);
+      color: #ffffff !important;
+      border-color: #ef4444;
+      box-shadow: 0 4px 14px rgba(220, 38, 38, 0.4);
+    }
+
+    /* ---- CAMERA & SCANNER VIEWPORT ---- */
+    .scanner-wrapper {
+      position: relative;
+      width: 100%;
+      min-height: 270px;
+      background: #000;
+      border-radius: 16px;
+      overflow: hidden;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      box-shadow: 0 4px 20px rgba(0,0,0,0.25);
     }
 
     #reader {
-      width: 100%;
-      border-radius: 8px;
-      overflow: hidden;
-      margin-top: 10px;
-      border: 1px dashed #94a3b8;
+      width: 100% !important;
+      border: none !important;
     }
 
-    .status-card {
-      margin-top: 16px;
-      padding: 12px;
-      border-radius: 8px;
-      font-size: 0.9rem;
-      display: none;
+    #reader video {
+      object-fit: cover !important;
+      border-radius: 16px;
     }
 
-    .status-success {
-      background-color: #dcfce7;
-      border: 1px solid var(--success);
-      color: var(--success);
-      display: block;
-    }
-
-    .status-error {
-      background-color: #fee2e2;
-      border: 1px solid var(--error);
-      color: var(--error);
-      display: block;
-    }
-
-    .student-details {
-      margin-top: 6px;
-      font-size: 0.85rem;
-      line-height: 1.4;
-      color: #334155;
-    }
-
-    .log-list {
-      margin-top: 16px;
-      border-top: 1px solid #e2e8f0;
-      padding-top: 10px;
-      font-size: 0.8rem;
-    }
-
-    .log-item {
-      padding: 6px 0;
-      border-bottom: 1px solid #f1f5f9;
+    #permission-overlay {
+      position: absolute;
+      inset: 0;
+      background: rgba(15, 5, 10, 0.94);
+      backdrop-filter: blur(8px);
+      -webkit-backdrop-filter: blur(8px);
       display: flex;
-      justify-content: space-between;
+      flex-direction: column;
+      align-items: center;
+      justify-content: center;
+      z-index: 15;
+      padding: 20px;
+      text-align: center;
+    }
+
+    #permission-overlay button {
+      background: linear-gradient(135deg, #2563eb, #3b82f6);
+      color: #fff;
+      border: none;
+      padding: 13px 26px;
+      font-size: 0.96rem;
+      font-weight: 700;
+      border-radius: 12px;
+      cursor: pointer;
+      font-family: inherit;
+      box-shadow: 0 4px 16px rgba(37,99,235,0.45);
+      transition: transform 0.15s ease;
+    }
+
+    #permission-overlay button:hover {
+      transform: translateY(-1px);
+    }
+
+    #permission-overlay p {
+      color: #d1b8bc;
+      font-size: 0.8rem;
+      margin-top: 10px;
+      line-height: 1.4;
+    }
+
+    .viewfinder-reticle {
+      display: none;
+      position: absolute;
+      width: 220px;
+      height: 220px;
+      border: 2px solid rgba(255,255,255,0.25);
+      border-radius: 14px;
+      pointer-events: none;
+      z-index: 10;
+    }
+
+    .viewfinder-reticle::before,
+    .viewfinder-reticle::after {
+      content: "";
+      position: absolute;
+      width: 24px;
+      height: 24px;
+      border-color: #38bdf8;
+      border-style: solid;
+    }
+
+    .viewfinder-reticle::before {
+      top: -2px; left: -2px;
+      border-width: 4px 0 0 4px;
+      border-top-left-radius: 12px;
+    }
+
+    .viewfinder-reticle::after {
+      bottom: -2px; right: -2px;
+      border-width: 0 4px 4px 0;
+      border-bottom-right-radius: 12px;
+    }
+
+    .laser-line {
+      display: none;
+      position: absolute;
+      width: 210px;
+      height: 2px;
+      background: #ef4444;
+      box-shadow: 0 0 12px #ef4444;
+      animation: scanLaser 2s infinite ease-in-out;
+      z-index: 11;
+      pointer-events: none;
+    }
+
+    @keyframes scanLaser {
+      0%, 100% { transform: translateY(-90px); }
+      50% { transform: translateY(90px); }
+    }
+
+    /* ---- CONTROLS ROW ---- */
+    .camera-controls {
+      display: flex;
+      flex-wrap: wrap;
+      gap: 6px;
+      margin: 10px 0;
+    }
+
+    .camera-controls select, .camera-controls button, .action-btn {
+      padding: 9px 12px;
+      font-size: 0.82rem;
+      font-family: inherit;
+      border: 1px solid var(--border);
+      border-radius: 10px;
+      background: var(--input-bg);
+      backdrop-filter: var(--glass-blur-sm);
+      -webkit-backdrop-filter: var(--glass-blur-sm);
+      color: var(--text);
+      cursor: pointer;
+      box-shadow: inset 0 1px 0 var(--card-inset);
+      transition: transform 0.15s ease;
+    }
+
+    .camera-controls button:hover {
+      transform: translateY(-1px);
+    }
+
+    .camera-controls select {
+      flex: 1;
+      min-width: 140px;
+    }
+
+    /* ---- STATUS BANNER ---- */
+    #status {
+      text-align: center;
+      font-size: 0.88rem;
+      font-weight: 600;
+      margin: 10px 0;
+      min-height: 24px;
+      padding: 6px 12px;
+      border-radius: 10px;
+      background: rgba(0,0,0,0.03);
+    }
+
+    [data-theme="dark"] #status {
+      background: rgba(255,255,255,0.04);
+    }
+
+    /* ---- BUTTONS: EXPORT & CLEAR ---- */
+    .btn-export {
+      width: 100%;
+      background: linear-gradient(135deg, #16a34a, #15803d);
+      color: white;
+      border: 1px solid rgba(22, 163, 74, 0.3);
+      padding: 12px;
+      font-size: 0.95rem;
+      font-weight: 700;
+      font-family: inherit;
+      border-radius: 12px;
+      cursor: pointer;
+      margin-bottom: 8px;
+      box-shadow: 0 4px 16px rgba(22, 163, 74, 0.32);
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      gap: 6px;
+      transition: transform 0.15s ease, box-shadow 0.2s ease;
+    }
+
+    .btn-export:hover {
+      transform: translateY(-1px);
+      box-shadow: 0 6px 20px rgba(22, 163, 74, 0.4);
+    }
+
+    .btn-clear {
+      width: 100%;
+      background: var(--input-bg);
+      backdrop-filter: var(--glass-blur-sm);
+      -webkit-backdrop-filter: var(--glass-blur-sm);
+      color: var(--text-muted);
+      border: 1px solid var(--border);
+      padding: 8px;
+      font-size: 0.82rem;
+      font-family: inherit;
+      border-radius: 10px;
+      cursor: pointer;
+      transition: all 0.2s ease;
+    }
+
+    .btn-clear:hover {
+      color: var(--danger);
+      border-color: rgba(220, 38, 38, 0.3);
+    }
+
+    /* ---- CHIPS & STATS ---- */
+    .chips-bar {
+      display: flex;
+      flex-wrap: wrap;
+      gap: 6px;
+      margin: 8px 0;
+    }
+
+    .chip {
+      background: var(--chip-bg);
+      backdrop-filter: blur(8px);
+      -webkit-backdrop-filter: blur(8px);
+      padding: 5px 10px;
+      border-radius: 10px;
+      font-size: 0.75rem;
+      font-weight: 600;
+      border: 1px solid var(--border);
+    }
+
+    .search-bar {
+      width: 100%;
+      padding: 9px 14px;
+      font-size: 0.85rem;
+      font-family: inherit;
+      border: 1px solid var(--border);
+      border-radius: 10px;
+      background: var(--input-bg);
+      backdrop-filter: var(--glass-blur-sm);
+      -webkit-backdrop-filter: var(--glass-blur-sm);
+      color: var(--text);
+      margin-bottom: 10px;
+    }
+
+    .search-bar:focus {
+      outline: none;
+      border-color: var(--primary);
+    }
+
+    /* ============================================================
+       TABLE & CLOUD STATUS ICONS (GREEN CLOUD VS RED SPINNER)
+       ============================================================ */
+    .table-responsive {
+      overflow-x: auto;
+      max-height: 320px;
+      border-radius: 12px;
+      border: 1px solid var(--border);
+    }
+
+    table {
+      width: 100%;
+      border-collapse: collapse;
+      font-size: 0.75rem;
+    }
+
+    th, td {
+      border-bottom: 1px solid var(--border);
+      padding: 8px 10px;
+      text-align: left;
+      white-space: nowrap;
+    }
+
+    th {
+      background: var(--th-bg);
+      backdrop-filter: blur(10px);
+      -webkit-backdrop-filter: blur(10px);
+      position: sticky;
+      top: 0;
+      z-index: 2;
+      font-weight: 700;
+      text-transform: uppercase;
+      font-size: 0.68rem;
+      letter-spacing: 0.4px;
+    }
+
+    tr:hover {
+      background: var(--row-hover);
+    }
+
+    /* SYNC STATUS ICONS */
+    .sync-cell {
+      text-align: center;
+      width: 44px;
+      min-width: 44px;
+    }
+
+    /* Green Cloud Icon */
+    .cloud-synced {
+      display: inline-flex;
+      align-items: center;
+      justify-content: center;
+      color: #22c55e;
+      font-size: 1.15rem;
+      line-height: 1;
+      filter: drop-shadow(0 1px 2px rgba(34, 197, 94, 0.3));
+    }
+
+    /* Minimalist Red Circle Spinner (Hardware-Accelerated, Zero Refresh-Rate Hit) */
+    .red-loading-circle {
+      display: inline-block;
+      width: 15px;
+      height: 15px;
+      border: 2px solid rgba(239, 68, 68, 0.25);
+      border-top-color: #ef4444;
+      border-radius: 50%;
+      animation: spinCircle 0.8s linear infinite;
+      vertical-align: middle;
+      will-change: transform;
+    }
+
+    @keyframes spinCircle {
+      from { transform: rotate(0deg); }
+      to { transform: rotate(360deg); }
+    }
+
+    /* ============================================================
+       MODALS (Manual Entry & Cloud/Database Settings)
+       ============================================================ */
+    .modal {
+      display: none;
+      position: fixed;
+      inset: 0;
+      background: rgba(0, 0, 0, 0.55);
+      backdrop-filter: blur(6px);
+      -webkit-backdrop-filter: blur(6px);
+      z-index: 100;
+      align-items: center;
+      justify-content: center;
+      padding: 16px;
+    }
+
+    .modal-content {
+      background: var(--card);
+      backdrop-filter: var(--glass-blur);
+      -webkit-backdrop-filter: var(--glass-blur);
+      border: 1px solid var(--card-border);
+      padding: 22px;
+      border-radius: 20px;
+      width: 100%;
+      max-width: 460px;
+      box-shadow: 0 16px 48px var(--card-shadow), inset 0 1px 0 var(--card-inset);
+      max-height: 90vh;
+      overflow-y: auto;
+    }
+
+    .modal-content h3 {
+      margin: 0 0 12px 0;
+      font-size: 1.1rem;
+      color: var(--primary);
+      font-weight: 700;
+    }
+
+    .modal-content label {
+      display: block;
+      font-size: 0.78rem;
+      font-weight: 600;
+      margin: 8px 0 4px 2px;
+      color: var(--text-muted);
+    }
+
+    .modal-content input, .modal-content select, .modal-content textarea {
+      width: 100%;
+      padding: 10px 12px;
+      margin-bottom: 8px;
+      border: 1px solid var(--border);
+      border-radius: 10px;
+      background: var(--input-bg);
+      color: var(--text);
+      font-size: 0.85rem;
+      font-family: inherit;
+    }
+
+    .modal-actions {
+      display: flex;
+      gap: 8px;
+      margin-top: 14px;
+    }
+
+    .modal-actions button {
+      flex: 1;
+      padding: 11px;
+      border: none;
+      border-radius: 10px;
+      font-weight: 700;
+      font-family: inherit;
+      cursor: pointer;
+      transition: transform 0.15s ease;
+    }
+
+    .modal-actions button:hover {
+      transform: translateY(-1px);
+    }
+
+    .db-count-badge {
+      display: inline-block;
+      padding: 3px 8px;
+      border-radius: 12px;
+      font-size: 0.75rem;
+      background: var(--primary-subtle);
+      color: var(--primary);
+      font-weight: 700;
     }
   </style>
 </head>
 <body>
 
 <div class="container">
-  <h1>Attendance Checking System</h1>
+  <!-- Top Navigation / Header -->
+  <div class="header-bar">
+    <div class="header-left">
+      <h1>Attendance Scanner</h1>
+    </div>
+    <div class="header-actions">
+      <button class="pill-btn" onclick="openConfigModal()" title="Google Sheet & DB Settings">
+        ☁️ Sheet & DB
+      </button>
+      <button class="pill-btn" onclick="toggleTheme()" id="themeBtn" title="Toggle Light/Dark Theme">
+        🌙 Dark
+      </button>
+    </div>
+  </div>
 
-  <div class="form-group">
-    <label for="sessionType">Scan Mode / Session</label>
-    <select id="sessionType">
-      <option value="AM Time-In">AM Time-In</option>
-      <option value="AM Time-Out">AM Time-Out</option>
-      <option value="PM Time-In">PM Time-In</option>
-      <option value="PM Time-Out">PM Time-Out</option>
+  <!-- Real-Time Online / Offline Notice (Replaces Chrome Security Notice) -->
+  <div id="networkBanner" class="network-banner online">
+    <div class="banner-content">
+      <span class="banner-dot"></span>
+      <span id="networkText">Online — Cloud Sync Ready</span>
+    </div>
+    <div class="banner-extra" id="pendingSyncText">0 queued</div>
+  </div>
+
+  <!-- Main Card -->
+  <div class="card">
+    <!-- Event Name Configuration -->
+    <div class="event-input-row">
+      <input type="text" id="eventName" placeholder="Event Name (e.g., General-Assembly)" onchange="saveEventName()" />
+    </div>
+
+    <!-- 4-Option Mode Selection (AM/PM Time-In & Time-Out) -->
+    <div class="mode-grid">
+      <button id="btnAmIn" class="mode-btn in-btn active" onclick="setMode('AM Time-In')">
+        <span>AM IN</span>
+        <span class="mode-sub">Time-In</span>
+      </button>
+      <button id="btnAmOut" class="mode-btn out-btn" onclick="setMode('AM Time-Out')">
+        <span>AM OUT</span>
+        <span class="mode-sub">Time-Out</span>
+      </button>
+      <button id="btnPmIn" class="mode-btn in-btn" onclick="setMode('PM Time-In')">
+        <span>PM IN</span>
+        <span class="mode-sub">Time-In</span>
+      </button>
+      <button id="btnPmOut" class="mode-btn out-btn" onclick="setMode('PM Time-Out')">
+        <span>PM OUT</span>
+        <span class="mode-sub">Time-Out</span>
+      </button>
+    </div>
+
+    <!-- Live Scanner Viewport -->
+    <div class="scanner-wrapper">
+      <div id="reader"></div>
+
+      <div id="permission-overlay">
+        <button id="startCamBtn" onclick="initAndStartCamera()">📷 Open Camera / Scan</button>
+        <p>Tap to initialize camera permission.<br/>Fully compatible with Android & iOS.</p>
+      </div>
+
+      <div id="reticle" class="viewfinder-reticle"></div>
+      <div id="laser" class="laser-line"></div>
+    </div>
+
+    <!-- Hardware & Input Controls -->
+    <div class="camera-controls">
+      <select id="cameraSelect" onchange="changeCamera(this.value)">
+        <option value="">Detecting cameras...</option>
+      </select>
+      <button type="button" id="torchBtn" onclick="toggleTorch()">🔦 Flash</button>
+      <button type="button" onclick="initAndStartCamera()">🔄 Restart</button>
+
+      <!-- Zero-Fail Native Camera / Photo Decoder -->
+      <button type="button" onclick="document.getElementById('fileInput').click()">📁 Scan Photo</button>
+      <input type="file" id="fileInput" accept="image/*" capture="environment" style="display: none;" onchange="scanImageFile(this)" />
+
+      <!-- Manual Input Option -->
+      <button type="button" onclick="openManualModal()">✏️ Manual</button>
+    </div>
+
+    <div id="status">Tap "Open Camera" to begin scanning</div>
+
+    <!-- Actions: Export to Excel & Clear -->
+    <button class="btn-export" onclick="exportToExcel()">
+      <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round">
+        <path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"></path>
+        <polyline points="7 10 12 15 17 10"></polyline>
+        <line x1="12" y1="15" x2="12" y2="3"></line>
+      </svg>
+      Export to Excel (.xlsx)
+    </button>
+    <button class="btn-clear" onclick="clearData()">Clear All Records</button>
+  </div>
+
+  <!-- Real-Time Scanned Logs Table -->
+  <div class="card">
+    <div style="display: flex; justify-content:space-between; align-items:center; margin-bottom: 6px;">
+      <h3 style="margin: 0; font-size: 0.95rem;">Attendance Logs</h3>
+      <div style="display: flex; gap: 8px; align-items: center;">
+        <span class="db-count-badge" id="dbStatusBadge">DB: 0 Cached</span>
+        <span style="font-size: 0.8rem; font-weight: bold; color: var(--primary);" id="recordCount">Total: 0</span>
+      </div>
+    </div>
+
+    <!-- Live Program Tally -->
+    <div class="chips-bar" id="programChips">
+      <div class="chip">BSEE: 0</div>
+      <div class="chip">BSME: 0</div>
+      <div class="chip">BSCE: 0</div>
+      <div class="chip">BSPE: 0</div>
+    </div>
+
+    <!-- Real-Time Search Filter -->
+    <input
+      type="text"
+      id="searchInput"
+      class="search-bar"
+      placeholder="🔍 Filter by Name, Student #, Program, Mode..."
+      oninput="renderTable()"
+    />
+
+    <div class="table-responsive">
+      <table id="logsTable">
+        <thead>
+          <tr>
+            <th class="sync-cell" title="Cloud Sync Status: Green Cloud = Saved to Google Sheet | Red Spinner = Pending">Sync</th>
+            <th>Mode</th>
+            <th>Student #</th>
+            <th>Full Name</th>
+            <th>Program</th>
+            <th>Year</th>
+            <th>Date</th>
+            <th>Time</th>
+          </tr>
+        </thead>
+        <tbody id="logsBody"></tbody>
+      </table>
+    </div>
+  </div>
+</div>
+
+<!-- Manual Entry Modal -->
+<div id="manualModal" class="modal">
+  <div class="modal-content">
+    <h3>Manual Attendance Entry</h3>
+    <p style="font-size: 0.78rem; color: var(--text-muted); margin-top: -6px;">Enter student number to verify with database, or enter all details manually.</p>
+    
+    <label for="mStudentNum">Student Number (202#-4-####):</label>
+    <div style="display: flex; gap: 6px;">
+      <input type="text" id="mStudentNum" placeholder="2023-4-0301" oninput="autoLookupStudent(this.value)" />
+      <button type="button" class="pill-btn" style="border-radius: 10px; margin-bottom: 8px;" onclick="autoLookupStudent(document.getElementById('mStudentNum').value)">Lookup</button>
+    </div>
+
+    <label for="mProgram">Program:</label>
+    <select id="mProgram">
+      <option value="BSEE">BSEE</option>
+      <option value="BSME">BSME</option>
+      <option value="BSCE">BSCE</option>
+      <option value="BSPE">BSPE</option>
     </select>
+
+    <label for="mYear">Year Level:</label>
+    <select id="mYear">
+      <option value="1ST">1ST Year</option>
+      <option value="2ND">2ND Year</option>
+      <option value="3RD">3RD Year</option>
+      <option value="4TH">4TH Year</option>
+      <option value="5TH">5TH Year</option>
+    </select>
+
+    <label for="mName">Full Name (ALL CAPS: First M. Last):</label>
+    <input type="text" id="mName" placeholder="JUAN A. DELA CRUZ" />
+
+    <div class="modal-actions">
+      <button style="background:var(--input-bg); color:var(--text);" onclick="closeManualModal()">Cancel</button>
+      <button style="background:var(--success); color:#fff;" onclick="submitManualEntry()">Save Record</button>
+    </div>
   </div>
+</div>
 
-  <button id="toggleCameraBtn">Start Camera Scanner</button>
+<!-- Google Sheet & Database Configuration Modal -->
+<div id="configModal" class="modal">
+  <div class="modal-content">
+    <h3>☁️ Google Sheet & Database Setup</h3>
+    <p style="font-size: 0.78rem; color: var(--text-muted); margin-top: -6px;">
+      Connect your free Google Sheet Web App for automatic database syncing and online attendance logging.
+    </p>
 
-  <div id="reader"></div>
+    <label for="scriptUrlInput">Google Apps Script Web App URL:</label>
+    <input type="url" id="scriptUrlInput" placeholder="https://script.google.com/macros/s/.../exec" />
 
-  <div id="statusBox" class="status-card">
-    <strong id="statusTitle"></strong>
-    <div id="statusBody" class="student-details"></div>
-  </div>
+    <div style="display: flex; gap: 6px; margin-bottom: 12px;">
+      <button type="button" class="pill-btn" style="flex:1; justify-content:center; border-radius:10px;" onclick="syncDatabaseFromCloud()">
+        🔄 Sync Database Now
+      </button>
+      <button type="button" class="pill-btn" style="flex:1; justify-content:center; border-radius:10px;" onclick="syncPendingLogsNow()">
+        ☁️ Sync Pending Logs
+      </button>
+    </div>
 
-  <div class="log-list">
-    <label>Recent Scans (This Session)</label>
-    <div id="recentScans"></div>
+    <label>Local Student Database Cache (<span id="modalDbCount">0</span> records):</label>
+    <p style="font-size: 0.72rem; color: var(--text-muted); margin: 0 0 4px 0;">
+      Students are verified locally from this cache even when completely offline.
+    </p>
+
+    <div style="display: flex; gap: 6px; margin-bottom: 10px;">
+      <button type="button" class="pill-btn" style="flex:1; font-size:0.75rem; justify-content:center; border-radius:10px;" onclick="loadSampleDatabase()">
+        📂 Load Sample DB
+      </button>
+      <button type="button" class="pill-btn" style="flex:1; font-size:0.75rem; justify-content:center; border-radius:10px;" onclick="document.getElementById('dbCsvFileInput').click()">
+        📥 Import CSV
+      </button>
+      <input type="file" id="dbCsvFileInput" accept=".csv" style="display: none;" onchange="importCsvToDatabase(this)" />
+    </div>
+
+    <div class="modal-actions">
+      <button style="background:var(--input-bg); color:var(--text);" onclick="closeConfigModal()">Close</button>
+      <button style="background:var(--primary); color:#fff;" onclick="saveConfigSettings()">Save URL</button>
+    </div>
   </div>
 </div>
 
 <script>
-  // INSERT YOUR GOOGLE APPS SCRIPT WEB APP URL HERE:
-  const SCRIPT_URL = "https://script.google.com/macros/s/AKfycbzAtKIZZKMPgxTWW5ZSUZV6xSLlUvOEgMmvzF5HFSweel1bIxXqZT6JvwzlligfPCq8/exec";
-
+  /* ==========================================================
+     GLOBAL STATE
+     ========================================================== */
+  let currentMode = "AM Time-In";
+  let attendanceList = JSON.parse(localStorage.getItem("attendanceLogs") || "[]");
+  let studentDatabase = JSON.parse(localStorage.getItem("attendance_student_db") || "[]");
+  let scriptAppUrl = localStorage.getItem("attendance_script_url") || "";
+  
+  let isThrottled = false;
   let html5QrCode = null;
-  let isScanning = false;
-  let isProcessing = false;
+  let currentCameraId = null;
+  let isTorchOn = false;
+  let audioCtx = null;
+  let isSyncing = false;
 
-  const toggleBtn = document.getElementById("toggleCameraBtn");
-  const statusBox = document.getElementById("statusBox");
-  const statusTitle = document.getElementById("statusTitle");
-  const statusBody = document.getElementById("statusBody");
-  const recentScans = document.getElementById("recentScans");
-  const sessionTypeSelect = document.getElementById("sessionType");
-
-  // Format Helpers
-  function getFormattedDate(d) {
-    const yyyy = d.getFullYear();
-    const mm = String(d.getMonth() + 1).padStart(2, '0');
-    const dd = String(d.getDate()).padStart(2, '0');
-    return `${yyyy}/${mm}/${dd}`;
+  /* ==========================================================
+     1. THEME SWITCHER (Light / Dark - Fixed Inversion)
+     ========================================================== */
+  function initTheme() {
+    const saved = localStorage.getItem("app_theme") ||
+      (window.matchMedia("(prefers-color-scheme: dark)").matches ? "dark" : "light");
+    applyTheme(saved);
   }
 
-  function getFormattedTime(d) {
-    const hh = String(d.getHours()).padStart(2, '0');
-    const min = String(d.getMinutes()).padStart(2, '0');
-    const ss = String(d.getSeconds()).padStart(2, '0');
-    return `${hh}:${min}:${ss}`;
+  function toggleTheme() {
+    const current = document.documentElement.getAttribute("data-theme") || "light";
+    const nextTheme = current === "dark" ? "light" : "dark";
+    applyTheme(nextTheme);
   }
 
-  // Handle Successful Scan
-  async function onScanSuccess(decodedText) {
-    if (isProcessing) return;
-    isProcessing = true;
+  function applyTheme(theme) {
+    document.documentElement.setAttribute("data-theme", theme);
+    localStorage.setItem("app_theme", theme);
+    // Button shows the TARGET theme you can switch to
+    const themeBtn = document.getElementById("themeBtn");
+    if (themeBtn) {
+      themeBtn.innerText = theme === "dark" ? "☀️ Light" : "🌙 Dark";
+      themeBtn.title = theme === "dark" ? "Switch to Light Mode" : "Switch to Dark Mode";
+    }
+  }
 
-    const studentNumber = decodedText.trim();
+  function saveEventName() {
+    const name = document.getElementById("eventName").value.trim();
+    localStorage.setItem("attendance_event_name", name);
+  }
+
+  /* ==========================================================
+     2. ONLINE / OFFLINE REAL-TIME STATUS
+     ========================================================== */
+  function updateNetworkStatus() {
+    const isOnline = navigator.onLine;
+    const banner = document.getElementById("networkBanner");
+    const netText = document.getElementById("networkText");
+    const pendingText = document.getElementById("pendingSyncText");
+
+    const pendingCount = attendanceList.filter(item => !item.synced).length;
+    pendingText.innerText = pendingCount > 0 ? `${pendingCount} queued for sync` : `All synced`;
+
+    if (isOnline) {
+      banner.className = "network-banner online";
+      netText.innerText = "Online — Cloud Sync Ready";
+      // Auto sync pending records when back online
+      if (pendingCount > 0) {
+        triggerAutoSync();
+      }
+    } else {
+      banner.className = "network-banner offline";
+      netText.innerText = "Offline Mode — Scans Saved Locally";
+    }
+  }
+
+  window.addEventListener("online", updateNetworkStatus);
+  window.addEventListener("offline", updateNetworkStatus);
+
+  /* ==========================================================
+     3. AUDIO ENGINE (Pleasant Success Chime & High-Pitch "Too-Tot")
+     ========================================================== */
+  function getAudioContext() {
+    if (!audioCtx) {
+      const AudioClass = window.AudioContext || window.webkitAudioContext;
+      if (AudioClass) audioCtx = new AudioClass();
+    }
+    if (audioCtx && audioCtx.state === "suspended") {
+      audioCtx.resume();
+    }
+    return audioCtx;
+  }
+
+  // Two-Tone Success Chime
+  function playSuccessBeep() {
+    try {
+      const ctx = getAudioContext();
+      if (!ctx) return;
+
+      const now = ctx.currentTime;
+      const osc = ctx.createOscillator();
+      const gain = ctx.createGain();
+
+      osc.type = "sine";
+      osc.frequency.setValueAtTime(660, now);
+      osc.frequency.setValueAtTime(880, now + 0.12);
+
+      gain.gain.setValueAtTime(0.01, now);
+      gain.gain.linearRampToValueAtTime(0.55, now + 0.03);
+      gain.gain.exponentialRampToValueAtTime(0.01, now + 0.35);
+
+      osc.connect(gain);
+      gain.connect(ctx.destination);
+
+      osc.start(now);
+      osc.stop(now + 0.35);
+
+      if (navigator.vibrate) navigator.vibrate(60);
+    } catch (e) {
+      console.warn("Audio error:", e);
+    }
+  }
+
+  // HIGH-PITCH STACCATO "TOO-TOT" NOTIFICATION (Error / Reject)
+  function triggerErrorFeedback() {
+    if (navigator.vibrate) {
+      navigator.vibrate([180, 80, 180]);
+    }
+
+    try {
+      const ctx = getAudioContext();
+      if (!ctx) return;
+
+      const now = ctx.currentTime;
+
+      // Pulse 1: "TOO" (1450 Hz)
+      const osc1 = ctx.createOscillator();
+      const gain1 = ctx.createGain();
+      osc1.type = "square";
+      osc1.frequency.setValueAtTime(1450, now);
+
+      gain1.gain.setValueAtTime(0.01, now);
+      gain1.gain.linearRampToValueAtTime(0.4, now + 0.015);
+      gain1.gain.exponentialRampToValueAtTime(0.01, now + 0.10);
+
+      osc1.connect(gain1);
+      gain1.connect(ctx.destination);
+      osc1.start(now);
+      osc1.stop(now + 0.10);
+
+      // Pulse 2: "TOT" (1100 Hz)
+      const osc2 = ctx.createOscillator();
+      const gain2 = ctx.createGain();
+      osc2.type = "square";
+      osc2.frequency.setValueAtTime(1100, now + 0.14);
+
+      gain2.gain.setValueAtTime(0.01, now + 0.14);
+      gain2.gain.linearRampToValueAtTime(0.45, now + 0.155);
+      gain2.gain.exponentialRampToValueAtTime(0.01, now + 0.28);
+
+      osc2.connect(gain2);
+      gain2.connect(ctx.destination);
+      osc2.start(now + 0.14);
+      osc2.stop(now + 0.28);
+    } catch (e) {
+      console.warn("Audio error:", e);
+    }
+  }
+
+  /* ==========================================================
+     4. ATTENDANCE MODE SWITCHER (AM/PM IN & OUT)
+     ========================================================== */
+  function setMode(mode) {
+    currentMode = mode;
+    
+    document.getElementById("btnAmIn").classList.toggle("active", mode === "AM Time-In");
+    document.getElementById("btnAmOut").classList.toggle("active", mode === "AM Time-Out");
+    document.getElementById("btnPmIn").classList.toggle("active", mode === "PM Time-In");
+    document.getElementById("btnPmOut").classList.toggle("active", mode === "PM Time-Out");
+
+    updateStatus(`Mode switched: ${mode}`, "var(--primary)");
+  }
+
+  function updateStatus(msg, color = "var(--text)") {
+    const el = document.getElementById("status");
+    el.innerText = msg;
+    el.style.color = color;
+  }
+
+  /* ==========================================================
+     5. HARDWARE CAMERA ENGINE
+     ========================================================== */
+  async function initAndStartCamera() {
+    getAudioContext();
+    updateStatus("Requesting camera access...", "var(--primary)");
+
+    try {
+      if (navigator.mediaDevices && navigator.mediaDevices.getUserMedia) {
+        try {
+          const preStream = await navigator.mediaDevices.getUserMedia({ video: true });
+          preStream.getTracks().forEach(track => track.stop());
+        } catch (preErr) {
+          console.warn("Pre-permission check:", preErr);
+        }
+      }
+
+      if (!html5QrCode) {
+        html5QrCode = new Html5Qrcode("reader");
+      }
+
+      if (html5QrCode.isScanning) {
+        await html5QrCode.stop();
+      }
+
+      const devices = await Html5Qrcode.getCameras().catch(() => []);
+      const select = document.getElementById("cameraSelect");
+      select.innerHTML = "";
+
+      let selectedCamera = { facingMode: "environment" };
+
+      if (devices && devices.length > 0) {
+        let bestId = devices[0].id;
+        devices.forEach((cam, index) => {
+          const opt = document.createElement("option");
+          opt.value = cam.id;
+          opt.text = cam.label || `Camera ${index + 1}`;
+          select.appendChild(opt);
+
+          const lbl = (cam.label || "").toLowerCase();
+          if (lbl.includes("back") || lbl.includes("rear") || lbl.includes("environment")) {
+            bestId = cam.id;
+          }
+        });
+
+        if (!currentCameraId) currentCameraId = bestId;
+        select.value = currentCameraId;
+        selectedCamera = currentCameraId;
+      }
+
+      const config = {
+        fps: 15,
+        qrbox: (w, h) => {
+          const edge = Math.min(w, h);
+          const size = Math.floor(edge * 0.72);
+          return { width: Math.max(size, 200), height: Math.max(size, 200) };
+        },
+        aspectRatio: 1.0
+      };
+
+      try {
+        await html5QrCode.start(selectedCamera, config, onScanSuccess);
+      } catch (directErr) {
+        console.warn("Direct deviceId start failed, trying facingMode...", directErr);
+        await html5QrCode.start({ facingMode: "environment" }, config, onScanSuccess);
+      }
+
+      document.getElementById("permission-overlay").style.display = "none";
+      document.getElementById("reticle").style.display = "block";
+      document.getElementById("laser").style.display = "block";
+      updateStatus("Camera Active. Point at QR code.", "var(--success)");
+
+    } catch (err) {
+      console.error("Camera Init Error:", err);
+      let msg = "Camera Failed to Start.";
+
+      if (err.name === "NotAllowedError" || err.name === "PermissionDeniedError") {
+        msg = "Camera Permission Denied: Tap the lock icon in address bar to allow.";
+      } else if (err.name === "NotReadableError") {
+        msg = "Camera in use: Close other camera apps, then tap Restart.";
+      } else if (location.protocol !== "https:" && location.hostname !== "localhost") {
+        msg = "Use HTTPS or GitHub Pages for camera. Use '📁 Scan Photo' below as fallback!";
+      }
+
+      updateStatus(msg, "var(--danger)");
+      triggerErrorFeedback();
+    }
+  }
+
+  async function changeCamera(id) {
+    if (!id || id === currentCameraId) return;
+    currentCameraId = id;
+    if (html5QrCode && html5QrCode.isScanning) {
+      await html5QrCode.stop();
+      initAndStartCamera();
+    }
+  }
+
+  async function toggleTorch() {
+    if (!html5QrCode || !html5QrCode.isScanning) {
+      alert("Please open the camera first!");
+      return;
+    }
+    try {
+      isTorchOn = !isTorchOn;
+      await html5QrCode.applyVideoConstraints({
+        advanced: [{ torch: isTorchOn }]
+      });
+      document.getElementById("torchBtn").innerText = isTorchOn ? "🔦 On" : "🔦 Flash";
+    } catch (e) {
+      isTorchOn = false;
+      alert("Flashlight/Torch is not supported on this lens.");
+    }
+  }
+
+  async function scanImageFile(input) {
+    if (!input.files || input.files.length === 0) return;
+    const file = input.files[0];
+
+    updateStatus("Processing photo...", "var(--primary)");
+
+    try {
+      if (!html5QrCode) {
+        html5QrCode = new Html5Qrcode("reader");
+      }
+      const decoded = await html5QrCode.scanFile(file, true);
+      onScanSuccess(decoded);
+    } catch (err) {
+      console.error(err);
+      handleScanError("Could not read QR code from photo. Please retake clearly.");
+    } finally {
+      input.value = "";
+    }
+  }
+
+  /* ==========================================================
+     6. DATABASE LOOKUP & QR CODE SCANNING ENGINE
+     ========================================================== */
+  const studentNumRegex = /^202\d-4-\d{4}$/;
+  const validPrograms = ["BSEE", "BSME", "BSCE", "BSPE"];
+  const validYears = ["1ST", "2ND", "3RD", "4TH", "5TH"];
+
+  /**
+   * Scans can be:
+   * 1. Student Number only: "202#-4-####" -> looks up Database
+   * 2. Full Format: "Student-Number,Program,Year,Full-Name" -> verifies with Database
+   * 3. Legacy Format: "Program,Year,Full-Name,Student-Number" -> verifies with Database
+   */
+  function onScanSuccess(decodedText) {
+    if (isThrottled) return;
+
+    const raw = (decodedText || "").trim();
+    if (!raw) return;
+
+    let studentNumber = "";
+    let program = "";
+    let year = "";
+    let fullName = "";
+
+    // Check Case 1: Student Number Only (e.g. 2023-4-0301)
+    if (studentNumRegex.test(raw)) {
+      studentNumber = raw;
+      const dbMatch = findStudentInDatabase(studentNumber);
+      if (!dbMatch) {
+        handleScanError(`Student #${studentNumber} NOT in Database! Scan rejected.`);
+        return;
+      }
+      program = dbMatch.program;
+      year = dbMatch.year;
+      fullName = dbMatch.fullName;
+    } 
+    // Check Case 2 & 3: Comma-Separated Values
+    else if (raw.includes(",")) {
+      const parts = raw.split(",").map(p => p.trim());
+      if (parts.length !== 4) {
+        handleScanError("Invalid QR: Must be Student-Number or 4 values (SNo, Program, Year, Name)");
+        return;
+      }
+
+      // Determine which part is the student number
+      if (studentNumRegex.test(parts[0])) {
+        // Format: Student-Number, Program, Year, Full-Name
+        [studentNumber, program, year, fullName] = parts;
+      } else if (studentNumRegex.test(parts[3])) {
+        // Legacy Format: Program, Year, Full-Name, Student-Number
+        [program, year, fullName, studentNumber] = parts;
+      } else {
+        handleScanError("Invalid Student # format in QR (Must be 202#-4-####)");
+        return;
+      }
+
+      // VERIFY WITH DATABASE
+      const dbMatch = findStudentInDatabase(studentNumber);
+      if (!dbMatch) {
+        handleScanError(`Student #${studentNumber} NOT in Database! Scan rejected.`);
+        return;
+      }
+
+      // If database has more canonical information, use it, or validate program & year
+      if (!program || !validPrograms.includes(program)) program = dbMatch.program;
+      if (!year || !validYears.includes(year)) year = dbMatch.year;
+      if (!fullName) fullName = dbMatch.fullName;
+    } else {
+      handleScanError(`Unrecognized QR: "${raw}". Must be student number or comma-separated info.`);
+      return;
+    }
+
+    // Strict validation
+    if (!validPrograms.includes(program)) {
+      handleScanError(`Invalid Program: "${program}"`);
+      return;
+    }
+    if (!validYears.includes(year)) {
+      handleScanError(`Invalid Year: "${year}"`);
+      return;
+    }
+
+    processAttendanceRecord(program, year, fullName, studentNumber);
+  }
+
+  function findStudentInDatabase(studentNumber) {
+    const target = studentNumber.trim().toUpperCase();
+    return studentDatabase.find(s => (s.studentNumber || "").trim().toUpperCase() === target);
+  }
+
+  function processAttendanceRecord(program, year, fullName, studentNumber) {
     const now = new Date();
-    const dateStr = getFormattedDate(now);
-    const timeStr = getFormattedTime(now);
-    const session = sessionTypeSelect.value;
+    const pad = n => String(n).padStart(2, "0");
+    const scanDate = `${now.getFullYear()}/${pad(now.getMonth() + 1)}/${pad(now.getDate())}`;
+    const scanTime = `${pad(now.getHours())}:${pad(now.getMinutes())}:${pad(now.getSeconds())}`;
+    const eventName = (document.getElementById("eventName").value.trim() || "General-Event");
 
-    showStatus("Processing...", `Verifying: ${studentNumber}`, "neutral");
+    // STRICT DUPLICATE PREVENTION: No duplicate for same Student Number, Mode & Date
+    const alreadyScanned = attendanceList.some(
+      item => item["Student Number"] === studentNumber && item.Mode === currentMode && item.Date === scanDate
+    );
+
+    if (alreadyScanned) {
+      handleScanError(`Already scanned for ${currentMode} today!`);
+      return;
+    }
+
+    // Sanitize string to prevent Excel Formula Injection
+    const sanitize = (str) => (/^[=+\-@]/.test(str) ? `'${str}` : str);
+
+    const record = {
+      id: "rec_" + Date.now() + "_" + Math.floor(Math.random() * 1000),
+      Mode: currentMode,
+      "Student Number": sanitize(studentNumber),
+      "Full Name": sanitize(fullName),
+      "Program": sanitize(program),
+      "Year": sanitize(year),
+      "Date": scanDate,
+      "Time": scanTime,
+      "Event": eventName,
+      synced: false // false = Red Minimalist Loading Spinner, true = Green Cloud
+    };
+
+    attendanceList.unshift(record);
+    saveData();
+    renderTable();
+    updateNetworkStatus();
+
+    playSuccessBeep();
+    updateStatus(`✓ Logged: ${fullName} (${currentMode})`, "var(--success)");
+
+    // Auto-sync record to Google Sheet
+    sendRecordToGoogleSheet(record);
+
+    isThrottled = true;
+    setTimeout(() => { isThrottled = false; }, 2000);
+  }
+
+  function handleScanError(msg) {
+    triggerErrorFeedback();
+    updateStatus(`⚠ ${msg}`, "var(--danger)");
+    isThrottled = true;
+    setTimeout(() => { isThrottled = false; }, 2400);
+  }
+
+  function saveData() {
+    try {
+      localStorage.setItem("attendanceLogs", JSON.stringify(attendanceList));
+    } catch (e) {
+      alert("Local storage is full! Please export to Excel to backup records.");
+    }
+  }
+
+  /* ==========================================================
+     7. GOOGLE SHEET SYNC ENGINE (ONLINE SYNC & QUEUE)
+     ========================================================== */
+  async function sendRecordToGoogleSheet(record) {
+    if (!scriptAppUrl || !navigator.onLine) {
+      // Stays in local queue with red minimalist loading circle
+      return;
+    }
 
     try {
       const payload = {
-        studentNumber: studentNumber,
-        sessionType: session,
-        date: dateStr,
-        time: timeStr
+        action: "logAttendance",
+        records: [{
+          date: record.Date,
+          time: record.Time,
+          event: record.Event || document.getElementById("eventName").value.trim() || "General-Event",
+          mode: record.Mode,
+          studentNumber: record["Student Number"].replace(/^'/, ""),
+          program: record.Program,
+          year: record.Year,
+          fullName: record["Full Name"].replace(/^'/, "")
+        }]
       };
 
-      const response = await fetch(SCRIPT_URL, {
+      // Send to Google Apps Script Web App
+      // Using mode: 'no-cors' allows submission without CORS blockages on static sites/GitHub Pages
+      await fetch(scriptAppUrl, {
         method: "POST",
-        mode: "cors",
-        headers: { "Content-Type": "text/plain;charset=utf-8" },
+        mode: "no-cors",
+        headers: { "Content-Type": "application/json" },
         body: JSON.stringify(payload)
       });
 
+      // Mark this record as synced -> triggers Green Cloud
+      record.synced = true;
+      saveData();
+      renderTable();
+      updateNetworkStatus();
+
+    } catch (err) {
+      console.warn("Failed to sync record to Google Sheet:", err);
+      // Keeps red loading circle for background retry
+    }
+  }
+
+  async function triggerAutoSync() {
+    if (isSyncing || !scriptAppUrl || !navigator.onLine) return;
+    const unsynced = attendanceList.filter(item => !item.synced);
+    if (unsynced.length === 0) return;
+
+    isSyncing = true;
+    try {
+      const payload = {
+        action: "logAttendance",
+        records: unsynced.map(record => ({
+          date: record.Date,
+          time: record.Time,
+          event: record.Event || document.getElementById("eventName").value.trim() || "General-Event",
+          mode: record.Mode,
+          studentNumber: record["Student Number"].replace(/^'/, ""),
+          program: record.Program,
+          year: record.Year,
+          fullName: record["Full Name"].replace(/^'/, "")
+        }))
+      };
+
+      await fetch(scriptAppUrl, {
+        method: "POST",
+        mode: "no-cors",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify(payload)
+      });
+
+      // Mark all as synced
+      unsynced.forEach(rec => rec.synced = true);
+      saveData();
+      renderTable();
+      updateNetworkStatus();
+      updateStatus("✓ All queued records synced to Google Sheet!", "var(--success)");
+    } catch (err) {
+      console.warn("Auto-sync error:", err);
+    } finally {
+      isSyncing = false;
+    }
+  }
+
+  async function syncPendingLogsNow() {
+    if (!scriptAppUrl) {
+      alert("Please enter and save your Google Apps Script Web App URL first.");
+      return;
+    }
+    if (!navigator.onLine) {
+      alert("You are currently offline. Please reconnect to sync.");
+      return;
+    }
+    await triggerAutoSync();
+    alert("Sync complete!");
+  }
+
+  /* ==========================================================
+     8. DATABASE CACHING & SYNC (doGet from Google Sheet)
+     ========================================================== */
+  async function syncDatabaseFromCloud() {
+    if (!scriptAppUrl) {
+      alert("Please enter and save your Google Apps Script Web App URL first.");
+      return;
+    }
+    if (!navigator.onLine) {
+      alert("You are offline. Reconnect to sync the student database.");
+      return;
+    }
+
+    updateStatus("Syncing database from Google Sheet...", "var(--primary)");
+
+    try {
+      const response = await fetch(scriptAppUrl + "?action=getDatabase");
       const result = await response.json();
 
-      if (result.status === "success") {
-        const s = result.student;
-        showStatus(
-          "Recorded Successfully!",
-          `<strong>${s.fullName}</strong><br>ID: ${s.studentNumber}<br>Course & Year: ${s.program} - ${s.year}<br>Time: [${dateStr}] ${timeStr} (${session})`,
-          "success"
-        );
-        addRecentLog(s.fullName, studentNumber, timeStr);
+      if (result.status === "success" && Array.isArray(result.data)) {
+        studentDatabase = result.data.map(s => ({
+          studentNumber: (s.studentNumber || "").trim().toUpperCase(),
+          program: (s.program || "").trim().toUpperCase(),
+          year: (s.year || "").trim().toUpperCase(),
+          fullName: (s.fullName || "").trim().toUpperCase()
+        }));
+
+        localStorage.setItem("attendance_student_db", JSON.stringify(studentDatabase));
+        updateDbBadges();
+        updateStatus(`✓ Database Synced: ${studentDatabase.length} students loaded.`, "var(--success)");
+        alert(`Successfully synced ${studentDatabase.length} students from Google Sheet!`);
       } else {
-        showStatus(
-          "Validation Failed",
-          result.message || "Student Number not recognized.",
-          "error"
-        );
+        throw new Error(result.message || "Invalid database response format");
       }
     } catch (err) {
-      showStatus("Connection Error", "Check internet or Google Sheet script deployment.", "error");
-    } finally {
-      // Delay to avoid double-reading the same QR code immediately
-      setTimeout(() => { isProcessing = false; }, 2500);
+      console.error("Cloud DB Sync Error:", err);
+      alert("Database sync failed: " + err.message + "\nMake sure your Web App deployment is accessible by 'Anyone'.");
+      updateStatus("Database sync failed. Using local cache.", "var(--danger)");
     }
   }
 
-  function showStatus(title, message, type) {
-    statusBox.className = "status-card";
-    if (type === "success") statusBox.classList.add("status-success");
-    else if (type === "error") statusBox.classList.add("status-error");
-    else {
-      statusBox.style.display = "block";
-      statusBox.style.background = "#e2e8f0";
-      statusBox.style.color = "#1e293b";
-    }
-
-    statusTitle.innerHTML = title;
-    statusBody.innerHTML = message;
+  function updateDbBadges() {
+    const count = studentDatabase.length;
+    document.getElementById("dbStatusBadge").innerText = `DB: ${count} Cached`;
+    const modalBadge = document.getElementById("modalDbCount");
+    if (modalBadge) modalBadge.innerText = count;
   }
 
-  function addRecentLog(name, id, time) {
-    const div = document.createElement("div");
-    div.className = "log-item";
-    div.innerHTML = `<span><strong>${name}</strong> (${id})</span><span>${time}</span>`;
-    recentScans.prepend(div);
+  // Preload default sample database so scanning works immediately offline
+  function loadSampleDatabase() {
+    const samples = [
+      { studentNumber: "2023-4-0301", program: "BSEE", year: "4TH", fullName: "RED C. MARQUEZ" },
+      { studentNumber: "2024-4-1002", program: "BSPE", year: "1ST", fullName: "YELLOW B. BATONGBAKAL" },
+      { studentNumber: "2023-4-0003", program: "BSCE", year: "2ND", fullName: "VIOLET C. DILAW" },
+      { studentNumber: "2023-4-0004", program: "BSME", year: "3RD", fullName: "BLUE J. COLORS" },
+      { studentNumber: "2025-4-0005", program: "BSEE", year: "4TH", fullName: "HUE BLUE Z. QWERTY" },
+      { studentNumber: "2026-4-1006", program: "BSPE", year: "5TH", fullName: "ORANGE G. ORANGE" },
+      { studentNumber: "2021-4-0337", program: "BSPE", year: "2ND", fullName: "GREEN NA C. ASUL" },
+      { studentNumber: "2025-4-0208", program: "BSCE", year: "3RD", fullName: "RED BED D. RED" },
+      { studentNumber: "2023-4-0289", program: "BSME", year: "4TH", fullName: "GREY NA C. JEAN" },
+      { studentNumber: "2026-4-0290", program: "BSPE", year: "1ST", fullName: "HULK GREEN D. LANTERN" }
+    ];
+
+    studentDatabase = samples;
+    localStorage.setItem("attendance_student_db", JSON.stringify(studentDatabase));
+    updateDbBadges();
+    alert(`Loaded ${samples.length} sample students into local database cache!`);
   }
 
-  // Camera Management
-  toggleBtn.addEventListener("click", () => {
-    if (isScanning) {
-      html5QrCode.stop().then(() => {
-        isScanning = false;
-        toggleBtn.innerText = "Start Camera Scanner";
+  function importCsvToDatabase(input) {
+    if (!input.files || input.files.length === 0) return;
+    const file = input.files[0];
+    const reader = new FileReader();
+
+    reader.onload = function(e) {
+      const content = e.target.result;
+      const lines = content.split(/\r\n|\n/).map(l => l.trim()).filter(Boolean);
+      const imported = [];
+
+      lines.forEach((line, index) => {
+        // Skip header if detected
+        if (index === 0 && (line.toLowerCase().includes("student") || line.toLowerCase().includes("program"))) return;
+        
+        const cols = line.split(",").map(c => c.replace(/^["']|["']$/g, "").trim());
+        if (cols.length >= 4) {
+          // Check whether column 0 is student number or column 3
+          let sno = "", prog = "", yr = "", fn = "";
+          if (studentNumRegex.test(cols[0])) {
+            [sno, prog, yr, fn] = cols;
+          } else if (studentNumRegex.test(cols[3])) {
+            [prog, yr, fn, sno] = cols;
+          } else {
+            sno = cols[0];
+            prog = cols[1];
+            yr = cols[2];
+            fn = cols[3];
+          }
+
+          if (sno) {
+            imported.push({
+              studentNumber: sno.toUpperCase(),
+              program: prog.toUpperCase(),
+              year: yr.toUpperCase(),
+              fullName: fn.toUpperCase()
+            });
+          }
+        }
       });
+
+      if (imported.length > 0) {
+        studentDatabase = imported;
+        localStorage.setItem("attendance_student_db", JSON.stringify(studentDatabase));
+        updateDbBadges();
+        alert(`Successfully imported ${imported.length} student records into database cache!`);
+      } else {
+        alert("Could not parse CSV. Make sure it contains Student-Number, Program, Year, and Full-Name.");
+      }
+      input.value = "";
+    };
+
+    reader.readAsText(file);
+  }
+
+  /* ==========================================================
+     9. TABLE RENDERING (Green Cloud vs Red Minimalist Spinner)
+     ========================================================== */
+  function renderTable() {
+    const tbody = document.getElementById("logsBody");
+    const query = document.getElementById("searchInput").value.toLowerCase().trim();
+    tbody.innerHTML = "";
+
+    const counts = { BSEE: 0, BSME: 0, BSCE: 0, BSPE: 0 };
+
+    attendanceList.forEach((item) => {
+      if (counts[item.Program] !== undefined) {
+        counts[item.Program]++;
+      }
+
+      const matches =
+        (item["Full Name"] || "").toLowerCase().includes(query) ||
+        (item["Student Number"] || "").toLowerCase().includes(query) ||
+        (item.Program || "").toLowerCase().includes(query) ||
+        (item.Mode || "").toLowerCase().includes(query);
+
+      if (!matches && query !== "") return;
+
+      // CLOUD STATUS INDICATOR:
+      // Synced = Green Cloud Icon | Not Synced = Red Circle Animation Loading Icon
+      const syncIndicator = item.synced ? `
+        <span class="cloud-synced" title="Saved in Google Sheet">
+          <svg width="20" height="20" viewBox="0 0 24 24" fill="currentColor">
+            <path d="M19.35 10.04C18.67 6.59 15.64 4 12 4 9.11 4 6.6 5.64 5.35 8.04 2.34 8.36 0 10.91 0 14c0 3.31 2.69 6 6 6h13c2.76 0 5-2.24 5-5 0-2.64-2.05-4.78-4.65-4.96zM10 17l-3.5-3.5 1.41-1.41L10 14.17 15.09 9.08l1.41 1.41L10 17z"/>
+          </svg>
+        </span>
+      ` : `
+        <span title="Waiting to sync with Google Sheet (Pending/Offline)">
+          <span class="red-loading-circle"></span>
+        </span>
+      `;
+
+      const tr = document.createElement("tr");
+      tr.innerHTML = `
+        <td class="sync-cell">${syncIndicator}</td>
+        <td><strong>${item.Mode}</strong></td>
+        <td>${item["Student Number"]}</td>
+        <td>${item["Full Name"]}</td>
+        <td>${item.Program}</td>
+        <td>${item.Year}</td>
+        <td>${item.Date}</td>
+        <td>${item.Time}</td>
+      `;
+      tbody.appendChild(tr);
+    });
+
+    document.getElementById("recordCount").innerText = `Total: ${attendanceList.length}`;
+    document.getElementById("programChips").innerHTML = `
+      <div class="chip">BSEE: ${counts.BSEE}</div>
+      <div class="chip">BSME: ${counts.BSME}</div>
+      <div class="chip">BSCE: ${counts.BSCE}</div>
+      <div class="chip">BSPE: ${counts.BSPE}</div>
+    `;
+  }
+
+  /* ==========================================================
+     10. MANUAL ENTRY MODAL
+     ========================================================== */
+  function openManualModal() {
+    document.getElementById("manualModal").style.display = "flex";
+  }
+
+  function closeManualModal() {
+    document.getElementById("manualModal").style.display = "none";
+  }
+
+  function autoLookupStudent(sno) {
+    const raw = (sno || "").trim();
+    if (!studentNumRegex.test(raw)) return;
+
+    const match = findStudentInDatabase(raw);
+    if (match) {
+      if (match.program) document.getElementById("mProgram").value = match.program;
+      if (match.year) document.getElementById("mYear").value = match.year;
+      if (match.fullName) document.getElementById("mName").value = match.fullName;
+    }
+  }
+
+  function submitManualEntry() {
+    const sno = document.getElementById("mStudentNum").value.trim().toUpperCase();
+    const program = document.getElementById("mProgram").value.trim().toUpperCase();
+    const year = document.getElementById("mYear").value.trim().toUpperCase();
+    const name = document.getElementById("mName").value.trim().toUpperCase();
+
+    if (!studentNumRegex.test(sno)) {
+      alert("Student Number must match format: 202#-4-####");
+      return;
+    }
+
+    // Verify against Database
+    const dbMatch = findStudentInDatabase(sno);
+    if (!dbMatch) {
+      const proceed = confirm(`Student #${sno} is NOT in the database cache. Do you want to add anyway?`);
+      if (!proceed) return;
+    }
+
+    if (!name) {
+      alert("Please enter Full Name.");
+      return;
+    }
+
+    processAttendanceRecord(program, year, name, sno);
+    closeManualModal();
+    document.getElementById("mName").value = "";
+    document.getElementById("mStudentNum").value = "";
+  }
+
+  /* ==========================================================
+     11. CONFIGURATION MODAL (CLOUD & DATABASE)
+     ========================================================== */
+  function openConfigModal() {
+    document.getElementById("scriptUrlInput").value = scriptAppUrl;
+    updateDbBadges();
+    document.getElementById("configModal").style.display = "flex";
+  }
+
+  function closeConfigModal() {
+    document.getElementById("configModal").style.display = "none";
+  }
+
+  function saveConfigSettings() {
+    scriptAppUrl = document.getElementById("scriptUrlInput").value.trim();
+    localStorage.setItem("attendance_script_url", scriptAppUrl);
+    closeConfigModal();
+    updateStatus("Google Apps Script URL saved.", "var(--success)");
+    updateNetworkStatus();
+  }
+
+  /* ==========================================================
+     12. EXPORT TO EXCEL (.xlsx)
+     ========================================================== */
+  function exportToExcel() {
+    if (attendanceList.length === 0) {
+      alert("No attendance records to export.");
+      return;
+    }
+
+    try {
+      const exportData = attendanceList.map(item => ({
+        "Date": item.Date,
+        "Time": item.Time,
+        "Event": item.Event || document.getElementById("eventName").value.trim() || "General-Event",
+        "Mode": item.Mode,
+        "Student Number": item["Student Number"],
+        "Program": item.Program,
+        "Year": item.Year,
+        "Full Name": item["Full Name"],
+        "Google Sheet Synced": item.synced ? "YES" : "PENDING"
+      }));
+
+      const worksheet = XLSX.utils.json_to_sheet(exportData);
+      const workbook = XLSX.utils.book_new();
+      XLSX.utils.book_append_sheet(workbook, worksheet, "Attendance");
+
+      worksheet["!cols"] = [
+        { wch: 14 }, // Date
+        { wch: 12 }, // Time
+        { wch: 22 }, // Event
+        { wch: 14 }, // Mode
+        { wch: 18 }, // Student Number
+        { wch: 10 }, // Program
+        { wch: 8 },  // Year
+        { wch: 28 }, // Full Name
+        { wch: 16 }  // Google Sheet Synced
+      ];
+
+      // Format Student Number column as string
+      Object.keys(worksheet).forEach(cell => {
+        if (cell.startsWith('E') && cell !== 'E1') {
+          worksheet[cell].t = 's';
+        }
+      });
+
+      const eventTag = (document.getElementById("eventName").value.trim() || "Event").replace(/[^a-zA-Z0-9_\-]/g, "_");
+      const now = new Date();
+      const pad = n => String(n).padStart(2, "0");
+      const datePart = `${now.getFullYear()}-${pad(now.getMonth() + 1)}-${pad(now.getDate())}`;
+      const timePart = `${pad(now.getHours())}-${pad(now.getMinutes())}-${pad(now.getSeconds())}`;
+      const fileName = `Attendance-${eventTag}-[${datePart}_${timePart}].xlsx`;
+
+      const wbout = XLSX.write(workbook, { bookType: "xlsx", type: "array" });
+      const blob = new Blob([wbout], {
+        type: "application/vnd.openxmlformats-officedocument.spreadsheetml.sheet"
+      });
+
+      const url = URL.createObjectURL(blob);
+      const a = document.createElement("a");
+      a.href = url;
+      a.download = fileName;
+      document.body.appendChild(a);
+      a.click();
+
+      setTimeout(() => {
+        document.body.removeChild(a);
+        URL.revokeObjectURL(url);
+      }, 1000);
+
+      updateStatus(`Exported: ${fileName}`, "var(--success)");
+    } catch (err) {
+      console.error("Export error:", err);
+      alert("Export failed. Please check browser permissions.");
+    }
+  }
+
+  function clearData() {
+    if (confirm("Are you sure you want to clear all attendance logs? Ensure you have exported to Excel first!")) {
+      attendanceList = [];
+      localStorage.removeItem("attendanceLogs");
+      renderTable();
+      updateNetworkStatus();
+      updateStatus("All attendance records cleared.", "var(--text)");
+    }
+  }
+
+  /* ==========================================================
+     13. INITIALIZATION
+     ========================================================== */
+  window.addEventListener("DOMContentLoaded", () => {
+    initTheme();
+
+    // Load initial sample database if empty
+    if (!studentDatabase || studentDatabase.length === 0) {
+      loadSampleDatabase();
     } else {
-      html5QrCode = new Html5Qrcode("reader");
-      html5QrCode.start(
-        { facingMode: "environment" },
-        { fps: 10, qrbox: { width: 250, height: 250 } },
-        onScanSuccess
-      ).then(() => {
-        isScanning = true;
-        toggleBtn.innerText = "Stop Camera Scanner";
-      }).catch(err => {
-        alert("Camera permission denied or camera not found: " + err);
-      });
+      updateDbBadges();
     }
+
+    renderTable();
+    updateNetworkStatus();
+
+    const savedEvent = localStorage.getItem("attendance_event_name");
+    if (savedEvent) document.getElementById("eventName").value = savedEvent;
+
+    // Periodic network check & auto sync attempt every 30 seconds
+    setInterval(() => {
+      updateNetworkStatus();
+    }, 30000);
   });
 </script>
 </body>
