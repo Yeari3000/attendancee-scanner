@@ -185,7 +185,7 @@
     }
 
     /* ============================================================
-       ONLINE / OFFLINE STATUS BANNER (Dynamic Background)
+       ONLINE / OFFLINE STATUS BANNER
        ============================================================ */
     .network-banner {
       display: flex;
@@ -268,19 +268,19 @@
     .event-input-row {
       display: flex;
       gap: 8px;
-      margin-bottom: 10px;
+      margin-bottom: 8px;
     }
 
     .event-input-row input {
       flex: 1;
-      padding: 10px 14px;
-      border-radius: 12px;
+      padding: 9px 12px;
+      border-radius: 10px;
       border: 1px solid var(--border);
       background: var(--input-bg);
       backdrop-filter: var(--glass-blur-sm);
       -webkit-backdrop-filter: var(--glass-blur-sm);
       color: var(--text);
-      font-size: 0.88rem;
+      font-size: 0.85rem;
       font-family: inherit;
     }
 
@@ -290,25 +290,21 @@
       box-shadow: 0 0 0 3px var(--primary-subtle);
     }
 
-    /* ---- 4-MODE ATTENDANCE SWITCHER (AM / PM TIME-IN & TIME-OUT) ---- */
+    /* ============================================================
+       COMPACT 4-MODE SWITCHER (REDUCED SIZE FOR SMALLER DEVICES)
+       ============================================================ */
     .mode-grid {
       display: grid;
       grid-template-columns: repeat(4, 1fr);
-      gap: 6px;
-      margin-bottom: 12px;
-    }
-
-    @media (max-width: 480px) {
-      .mode-grid {
-        grid-template-columns: repeat(2, 1fr);
-      }
+      gap: 5px;
+      margin-bottom: 10px;
     }
 
     .mode-btn {
-      padding: 10px 6px;
-      font-size: 0.8rem;
+      padding: 6px 4px;
+      font-size: 0.72rem;
       font-weight: 700;
-      border-radius: 12px;
+      border-radius: 8px;
       border: 1.5px solid transparent;
       cursor: pointer;
       font-family: inherit;
@@ -316,19 +312,39 @@
       flex-direction: column;
       align-items: center;
       justify-content: center;
-      gap: 2px;
+      gap: 1px;
       backdrop-filter: blur(8px);
       -webkit-backdrop-filter: blur(8px);
-      transition: all 0.2s ease;
+      transition: all 0.15s ease;
       background: rgba(255, 255, 255, 0.2);
       color: var(--text-muted);
+      min-height: 36px;
+      line-height: 1.1;
     }
 
     .mode-btn span.mode-sub {
-      font-size: 0.66rem;
-      font-weight: 500;
+      font-size: 0.54rem;
+      font-weight: 600;
       opacity: 0.85;
       text-transform: uppercase;
+      letter-spacing: 0.2px;
+    }
+
+    @media (max-width: 480px) {
+      .mode-grid {
+        grid-template-columns: repeat(4, 1fr);
+        gap: 4px;
+        margin-bottom: 8px;
+      }
+      .mode-btn {
+        padding: 5px 2px;
+        font-size: 0.66rem;
+        min-height: 34px;
+        border-radius: 7px;
+      }
+      .mode-btn span.mode-sub {
+        font-size: 0.48rem;
+      }
     }
 
     /* TIME-IN STYLES (Blue) */
@@ -346,7 +362,7 @@
       background: linear-gradient(135deg, #2563eb, #1d4ed8);
       color: #ffffff !important;
       border-color: #3b82f6;
-      box-shadow: 0 4px 14px rgba(37, 99, 235, 0.4);
+      box-shadow: 0 3px 10px rgba(37, 99, 235, 0.35);
     }
 
     /* TIME-OUT STYLES (Crimson/Red) */
@@ -364,16 +380,16 @@
       background: linear-gradient(135deg, #dc2626, #b91c1c);
       color: #ffffff !important;
       border-color: #ef4444;
-      box-shadow: 0 4px 14px rgba(220, 38, 38, 0.4);
+      box-shadow: 0 3px 10px rgba(220, 38, 38, 0.35);
     }
 
     /* ---- CAMERA & SCANNER VIEWPORT ---- */
     .scanner-wrapper {
       position: relative;
       width: 100%;
-      min-height: 270px;
+      min-height: 250px;
       background: #000;
-      border-radius: 16px;
+      border-radius: 14px;
       overflow: hidden;
       display: flex;
       align-items: center;
@@ -388,7 +404,7 @@
 
     #reader video {
       object-fit: cover !important;
-      border-radius: 16px;
+      border-radius: 14px;
     }
 
     #permission-overlay {
@@ -410,10 +426,10 @@
       background: linear-gradient(135deg, #2563eb, #3b82f6);
       color: #fff;
       border: none;
-      padding: 13px 26px;
-      font-size: 0.96rem;
+      padding: 12px 24px;
+      font-size: 0.92rem;
       font-weight: 700;
-      border-radius: 12px;
+      border-radius: 11px;
       cursor: pointer;
       font-family: inherit;
       box-shadow: 0 4px 16px rgba(37,99,235,0.45);
@@ -434,8 +450,8 @@
     .viewfinder-reticle {
       display: none;
       position: absolute;
-      width: 220px;
-      height: 220px;
+      width: 210px;
+      height: 210px;
       border: 2px solid rgba(255,255,255,0.25);
       border-radius: 14px;
       pointer-events: none;
@@ -467,7 +483,7 @@
     .laser-line {
       display: none;
       position: absolute;
-      width: 210px;
+      width: 200px;
       height: 2px;
       background: #ef4444;
       box-shadow: 0 0 12px #ef4444;
@@ -477,8 +493,8 @@
     }
 
     @keyframes scanLaser {
-      0%, 100% { transform: translateY(-90px); }
-      50% { transform: translateY(90px); }
+      0%, 100% { transform: translateY(-85px); }
+      50% { transform: translateY(85px); }
     }
 
     /* ---- CONTROLS ROW ---- */
@@ -486,22 +502,23 @@
       display: flex;
       flex-wrap: wrap;
       gap: 6px;
-      margin: 10px 0;
+      margin: 9px 0;
     }
 
-    .camera-controls select, .camera-controls button, .action-btn {
-      padding: 9px 12px;
-      font-size: 0.82rem;
+    .camera-controls select, .camera-controls button {
+      padding: 8px 12px;
+      font-size: 0.80rem;
       font-family: inherit;
       border: 1px solid var(--border);
-      border-radius: 10px;
+      border-radius: 9px;
       background: var(--input-bg);
       backdrop-filter: var(--glass-blur-sm);
       -webkit-backdrop-filter: var(--glass-blur-sm);
       color: var(--text);
       cursor: pointer;
       box-shadow: inset 0 1px 0 var(--card-inset);
-      transition: transform 0.15s ease;
+      transition: transform 0.15s ease, background-color 0.2s ease;
+      font-weight: 600;
     }
 
     .camera-controls button:hover {
@@ -513,15 +530,20 @@
       min-width: 140px;
     }
 
+    /* Off Cam Button Alert Accent */
+    #offCamBtn {
+      font-weight: 700;
+    }
+
     /* ---- STATUS BANNER ---- */
     #status {
       text-align: center;
-      font-size: 0.88rem;
+      font-size: 0.86rem;
       font-weight: 600;
-      margin: 10px 0;
-      min-height: 24px;
+      margin: 8px 0;
+      min-height: 22px;
       padding: 6px 12px;
-      border-radius: 10px;
+      border-radius: 9px;
       background: rgba(0,0,0,0.03);
     }
 
@@ -535,14 +557,14 @@
       background: linear-gradient(135deg, #16a34a, #15803d);
       color: white;
       border: 1px solid rgba(22, 163, 74, 0.3);
-      padding: 12px;
-      font-size: 0.95rem;
+      padding: 11px;
+      font-size: 0.92rem;
       font-weight: 700;
       font-family: inherit;
-      border-radius: 12px;
+      border-radius: 11px;
       cursor: pointer;
-      margin-bottom: 8px;
-      box-shadow: 0 4px 16px rgba(22, 163, 74, 0.32);
+      margin-bottom: 7px;
+      box-shadow: 0 4px 14px rgba(22, 163, 74, 0.32);
       display: flex;
       align-items: center;
       justify-content: center;
@@ -552,7 +574,7 @@
 
     .btn-export:hover {
       transform: translateY(-1px);
-      box-shadow: 0 6px 20px rgba(22, 163, 74, 0.4);
+      box-shadow: 0 6px 18px rgba(22, 163, 74, 0.4);
     }
 
     .btn-clear {
@@ -562,10 +584,10 @@
       -webkit-backdrop-filter: var(--glass-blur-sm);
       color: var(--text-muted);
       border: 1px solid var(--border);
-      padding: 8px;
-      font-size: 0.82rem;
+      padding: 7px;
+      font-size: 0.80rem;
       font-family: inherit;
-      border-radius: 10px;
+      border-radius: 9px;
       cursor: pointer;
       transition: all 0.2s ease;
     }
@@ -587,25 +609,25 @@
       background: var(--chip-bg);
       backdrop-filter: blur(8px);
       -webkit-backdrop-filter: blur(8px);
-      padding: 5px 10px;
-      border-radius: 10px;
-      font-size: 0.75rem;
+      padding: 4px 9px;
+      border-radius: 8px;
+      font-size: 0.74rem;
       font-weight: 600;
       border: 1px solid var(--border);
     }
 
     .search-bar {
       width: 100%;
-      padding: 9px 14px;
-      font-size: 0.85rem;
+      padding: 9px 12px;
+      font-size: 0.84rem;
       font-family: inherit;
       border: 1px solid var(--border);
-      border-radius: 10px;
+      border-radius: 9px;
       background: var(--input-bg);
       backdrop-filter: var(--glass-blur-sm);
       -webkit-backdrop-filter: var(--glass-blur-sm);
       color: var(--text);
-      margin-bottom: 10px;
+      margin-bottom: 9px;
     }
 
     .search-bar:focus {
@@ -614,12 +636,12 @@
     }
 
     /* ============================================================
-       TABLE & CLOUD STATUS ICONS (GREEN CLOUD VS RED SPINNER)
+       TABLE & CLOUD STATUS ICONS
        ============================================================ */
     .table-responsive {
       overflow-x: auto;
       max-height: 320px;
-      border-radius: 12px;
+      border-radius: 11px;
       border: 1px solid var(--border);
     }
 
@@ -671,7 +693,7 @@
       filter: drop-shadow(0 1px 2px rgba(34, 197, 94, 0.3));
     }
 
-    /* Minimalist Red Circle Spinner (Hardware-Accelerated, Zero Refresh-Rate Hit) */
+    /* Minimalist Red Circle Spinner */
     .red-loading-circle {
       display: inline-block;
       width: 15px;
@@ -690,60 +712,83 @@
     }
 
     /* ============================================================
-       MODALS (Manual Entry & Cloud/Database Settings)
+       GOOGLE SHEET & DATABASE CONFIGURATION MODAL
+       - Scroll disabled when open
+       - Paragraph & Label text is WHITE in both Light & Dark themes
        ============================================================ */
     .modal {
       display: none;
       position: fixed;
       inset: 0;
-      background: rgba(0, 0, 0, 0.55);
-      backdrop-filter: blur(6px);
-      -webkit-backdrop-filter: blur(6px);
+      background: rgba(0, 0, 0, 0.65);
+      backdrop-filter: blur(8px);
+      -webkit-backdrop-filter: blur(8px);
       z-index: 100;
       align-items: center;
       justify-content: center;
       padding: 16px;
+      overscroll-behavior: contain;
     }
 
-    .modal-content {
-      background: var(--card);
-      backdrop-filter: var(--glass-blur);
-      -webkit-backdrop-filter: var(--glass-blur);
-      border: 1px solid var(--card-border);
+    #configModal .modal-content {
+      background: rgba(26, 12, 18, 0.94) !important;
+      backdrop-filter: blur(24px) saturate(1.6) !important;
+      -webkit-backdrop-filter: blur(24px) saturate(1.6) !important;
+      border: 1px solid rgba(255, 255, 255, 0.25) !important;
       padding: 22px;
       border-radius: 20px;
       width: 100%;
       max-width: 460px;
-      box-shadow: 0 16px 48px var(--card-shadow), inset 0 1px 0 var(--card-inset);
+      box-shadow: 0 20px 60px rgba(0, 0, 0, 0.65), inset 0 1px 0 rgba(255, 255, 255, 0.2);
       max-height: 90vh;
       overflow-y: auto;
     }
 
-    .modal-content h3 {
+    /* WHITE TEXT BOTH LIGHT & DARK THEME FOR SHEET & DB SETTINGS */
+    #configModal h3 {
       margin: 0 0 12px 0;
       font-size: 1.1rem;
-      color: var(--primary);
+      color: #ffffff !important;
       font-weight: 700;
     }
 
-    .modal-content label {
+    #configModal label,
+    #configModal .modal-content label {
       display: block;
-      font-size: 0.78rem;
+      font-size: 0.80rem;
       font-weight: 600;
-      margin: 8px 0 4px 2px;
-      color: var(--text-muted);
+      margin: 9px 0 4px 2px;
+      color: #ffffff !important;
     }
 
-    .modal-content input, .modal-content select, .modal-content textarea {
+    #configModal p,
+    #configModal .modal-content p {
+      color: #ffffff !important;
+      opacity: 0.92;
+      line-height: 1.4;
+    }
+
+    #configModal span#modalDbCount {
+      color: #ffffff !important;
+      font-weight: 700;
+    }
+
+    #configModal input {
       width: 100%;
       padding: 10px 12px;
       margin-bottom: 8px;
-      border: 1px solid var(--border);
+      border: 1px solid rgba(255, 255, 255, 0.25);
       border-radius: 10px;
-      background: var(--input-bg);
-      color: var(--text);
+      background: rgba(255, 255, 255, 0.12);
+      color: #ffffff;
       font-size: 0.85rem;
       font-family: inherit;
+    }
+
+    #configModal input:focus {
+      outline: none;
+      border-color: #ff4d6a;
+      background: rgba(255, 255, 255, 0.18);
     }
 
     .modal-actions {
@@ -796,7 +841,7 @@
     </div>
   </div>
 
-  <!-- Real-Time Online / Offline Notice (Replaces Chrome Security Notice) -->
+  <!-- Real-Time Online / Offline Notice -->
   <div id="networkBanner" class="network-banner online">
     <div class="banner-content">
       <span class="banner-dot"></span>
@@ -812,7 +857,7 @@
       <input type="text" id="eventName" placeholder="Event Name (e.g., General-Assembly)" onchange="saveEventName()" />
     </div>
 
-    <!-- 4-Option Mode Selection (AM/PM Time-In & Time-Out) -->
+    <!-- 4-Option Mode Selection (AM/PM Time-In & Time-Out) - Compact Size for Mobile -->
     <div class="mode-grid">
       <button id="btnAmIn" class="mode-btn in-btn active" onclick="setMode('AM Time-In')">
         <span>AM IN</span>
@@ -845,20 +890,13 @@
       <div id="laser" class="laser-line"></div>
     </div>
 
-    <!-- Hardware & Input Controls -->
+    <!-- Hardware Controls (Camera Select, Flash, and Off Cam Feature) -->
     <div class="camera-controls">
       <select id="cameraSelect" onchange="changeCamera(this.value)">
         <option value="">Detecting cameras...</option>
       </select>
       <button type="button" id="torchBtn" onclick="toggleTorch()">🔦 Flash</button>
-      <button type="button" onclick="initAndStartCamera()">🔄 Restart</button>
-
-      <!-- Zero-Fail Native Camera / Photo Decoder -->
-      <button type="button" onclick="document.getElementById('fileInput').click()">📁 Scan Photo</button>
-      <input type="file" id="fileInput" accept="image/*" capture="environment" style="display: none;" onchange="scanImageFile(this)" />
-
-      <!-- Manual Input Option -->
-      <button type="button" onclick="openManualModal()">✏️ Manual</button>
+      <button type="button" id="offCamBtn" onclick="toggleOffCamera()">⏹️ Off Cam</button>
     </div>
 
     <div id="status">Tap "Open Camera" to begin scanning</div>
@@ -922,50 +960,11 @@
   </div>
 </div>
 
-<!-- Manual Entry Modal -->
-<div id="manualModal" class="modal">
-  <div class="modal-content">
-    <h3>Manual Attendance Entry</h3>
-    <p style="font-size: 0.78rem; color: var(--text-muted); margin-top: -6px;">Enter student number to verify with database, or enter all details manually.</p>
-    
-    <label for="mStudentNum">Student Number (202#-4-####):</label>
-    <div style="display: flex; gap: 6px;">
-      <input type="text" id="mStudentNum" placeholder="2023-4-0301" oninput="autoLookupStudent(this.value)" />
-      <button type="button" class="pill-btn" style="border-radius: 10px; margin-bottom: 8px;" onclick="autoLookupStudent(document.getElementById('mStudentNum').value)">Lookup</button>
-    </div>
-
-    <label for="mProgram">Program:</label>
-    <select id="mProgram">
-      <option value="BSEE">BSEE</option>
-      <option value="BSME">BSME</option>
-      <option value="BSCE">BSCE</option>
-      <option value="BSPE">BSPE</option>
-    </select>
-
-    <label for="mYear">Year Level:</label>
-    <select id="mYear">
-      <option value="1ST">1ST Year</option>
-      <option value="2ND">2ND Year</option>
-      <option value="3RD">3RD Year</option>
-      <option value="4TH">4TH Year</option>
-      <option value="5TH">5TH Year</option>
-    </select>
-
-    <label for="mName">Full Name (ALL CAPS: First M. Last):</label>
-    <input type="text" id="mName" placeholder="JUAN A. DELA CRUZ" />
-
-    <div class="modal-actions">
-      <button style="background:var(--input-bg); color:var(--text);" onclick="closeManualModal()">Cancel</button>
-      <button style="background:var(--success); color:#fff;" onclick="submitManualEntry()">Save Record</button>
-    </div>
-  </div>
-</div>
-
 <!-- Google Sheet & Database Configuration Modal -->
 <div id="configModal" class="modal">
   <div class="modal-content">
     <h3>☁️ Google Sheet & Database Setup</h3>
-    <p style="font-size: 0.78rem; color: var(--text-muted); margin-top: -6px;">
+    <p style="font-size: 0.78rem; margin-top: -6px;">
       Connect your free Google Sheet Web App for automatic database syncing and online attendance logging.
     </p>
 
@@ -973,44 +972,45 @@
     <input type="url" id="scriptUrlInput" placeholder="https://script.google.com/macros/s/.../exec" />
 
     <div style="display: flex; gap: 6px; margin-bottom: 12px;">
-      <button type="button" class="pill-btn" style="flex:1; justify-content:center; border-radius:10px;" onclick="syncDatabaseFromCloud()">
+      <button type="button" class="pill-btn" style="flex:1; justify-content:center; border-radius:10px; color:#fff; background:rgba(255,255,255,0.15);" onclick="syncDatabaseFromCloud()">
         🔄 Sync Database Now
       </button>
-      <button type="button" class="pill-btn" style="flex:1; justify-content:center; border-radius:10px;" onclick="syncPendingLogsNow()">
+      <button type="button" class="pill-btn" style="flex:1; justify-content:center; border-radius:10px; color:#fff; background:rgba(255,255,255,0.15);" onclick="syncPendingLogsNow()">
         ☁️ Sync Pending Logs
       </button>
     </div>
 
     <label>Local Student Database Cache (<span id="modalDbCount">0</span> records):</label>
-    <p style="font-size: 0.72rem; color: var(--text-muted); margin: 0 0 4px 0;">
+    <p style="font-size: 0.72rem; margin: 0 0 4px 0;">
       Students are verified locally from this cache even when completely offline.
     </p>
 
     <div style="display: flex; gap: 6px; margin-bottom: 10px;">
-      <button type="button" class="pill-btn" style="flex:1; font-size:0.75rem; justify-content:center; border-radius:10px;" onclick="loadSampleDatabase()">
+      <button type="button" class="pill-btn" style="flex:1; font-size:0.75rem; justify-content:center; border-radius:10px; color:#fff; background:rgba(255,255,255,0.15);" onclick="loadSampleDatabase()">
         📂 Load Sample DB
       </button>
-      <button type="button" class="pill-btn" style="flex:1; font-size:0.75rem; justify-content:center; border-radius:10px;" onclick="document.getElementById('dbCsvFileInput').click()">
+      <button type="button" class="pill-btn" style="flex:1; font-size:0.75rem; justify-content:center; border-radius:10px; color:#fff; background:rgba(255,255,255,0.15);" onclick="document.getElementById('dbCsvFileInput').click()">
         📥 Import CSV
       </button>
       <input type="file" id="dbCsvFileInput" accept=".csv" style="display: none;" onchange="importCsvToDatabase(this)" />
     </div>
 
     <div class="modal-actions">
-      <button style="background:var(--input-bg); color:var(--text);" onclick="closeConfigModal()">Close</button>
+      <button style="background:rgba(255,255,255,0.2); color:#fff;" onclick="closeConfigModal()">Close</button>
       <button style="background:var(--primary); color:#fff;" onclick="saveConfigSettings()">Save URL</button>
     </div>
   </div>
 </div>
 
 <script>
-  /* ==========================================================
-     GLOBAL STATE
-     ========================================================== */
+  /* GLOBAL STATE */
   let currentMode = "AM Time-In";
   let attendanceList = JSON.parse(localStorage.getItem("attendanceLogs") || "[]");
   let studentDatabase = JSON.parse(localStorage.getItem("attendance_student_db") || "[]");
   let scriptAppUrl = localStorage.getItem("attendance_script_url") || "";
+  
+  // Fast O(1) Hash Map for 1,500+ Students Lookup
+  let studentDatabaseMap = new Map();
   
   let isThrottled = false;
   let html5QrCode = null;
@@ -1019,9 +1019,36 @@
   let audioCtx = null;
   let isSyncing = false;
 
-  /* ==========================================================
-     1. THEME SWITCHER (Light / Dark - Fixed Inversion)
-     ========================================================== */
+  /* Helper to escape HTML against DOM-based XSS */
+  function escapeHtml(str) {
+    if (!str) return "";
+    return String(str)
+      .replace(/&/g, "&amp;")
+      .replace(/</g, "&lt;")
+      .replace(/>/g, "&gt;")
+      .replace(/"/g, "&quot;")
+      .replace(/'/g, "&#039;");
+  }
+
+  /* Sanitizer to prevent Formula Injection in Excel (.xlsx) */
+  function sanitizeExcel(str) {
+    const s = String(str || "").trim();
+    return (/^[=+\-@]/.test(s)) ? `'${s}` : s;
+  }
+
+  /* Rebuild O(1) Map for Student Lookup */
+  function rebuildStudentDbMap() {
+    studentDatabaseMap.clear();
+    for (let i = 0; i < studentDatabase.length; i++) {
+      const s = studentDatabase[i];
+      const key = (s.studentNumber || "").trim().toUpperCase();
+      if (key) {
+        studentDatabaseMap.set(key, s);
+      }
+    }
+  }
+
+  /* 1. THEME SWITCHER */
   function initTheme() {
     const saved = localStorage.getItem("app_theme") ||
       (window.matchMedia("(prefers-color-scheme: dark)").matches ? "dark" : "light");
@@ -1037,7 +1064,6 @@
   function applyTheme(theme) {
     document.documentElement.setAttribute("data-theme", theme);
     localStorage.setItem("app_theme", theme);
-    // Button shows the TARGET theme you can switch to
     const themeBtn = document.getElementById("themeBtn");
     if (themeBtn) {
       themeBtn.innerText = theme === "dark" ? "☀️ Light" : "🌙 Dark";
@@ -1050,37 +1076,33 @@
     localStorage.setItem("attendance_event_name", name);
   }
 
-  /* ==========================================================
-     2. ONLINE / OFFLINE REAL-TIME STATUS
-     ========================================================== */
-  function updateNetworkStatus() {
+  /* 2. ONLINE / OFFLINE STATUS BANNER ONLY (NO AUTO SYNC CONCURRENCY) */
+  function updateNetworkStatusBannerOnly() {
     const isOnline = navigator.onLine;
     const banner = document.getElementById("networkBanner");
     const netText = document.getElementById("networkText");
     const pendingText = document.getElementById("pendingSyncText");
 
     const pendingCount = attendanceList.filter(item => !item.synced).length;
-    pendingText.innerText = pendingCount > 0 ? `${pendingCount} queued for sync` : `All synced`;
+    pendingText.innerText = pendingCount > 0 ? `${pendingCount} queued` : `All synced`;
 
     if (isOnline) {
       banner.className = "network-banner online";
       netText.innerText = "Online — Cloud Sync Ready";
-      // Auto sync pending records when back online
-      if (pendingCount > 0) {
-        triggerAutoSync();
-      }
     } else {
       banner.className = "network-banner offline";
       netText.innerText = "Offline Mode — Scans Saved Locally";
     }
   }
 
-  window.addEventListener("online", updateNetworkStatus);
-  window.addEventListener("offline", updateNetworkStatus);
+  // Trigger sync when transitioning from offline to online
+  window.addEventListener("online", () => {
+    updateNetworkStatusBannerOnly();
+    triggerAutoSync();
+  });
+  window.addEventListener("offline", updateNetworkStatusBannerOnly);
 
-  /* ==========================================================
-     3. AUDIO ENGINE (Pleasant Success Chime & High-Pitch "Too-Tot")
-     ========================================================== */
+  /* 3. AUDIO ENGINE */
   function getAudioContext() {
     if (!audioCtx) {
       const AudioClass = window.AudioContext || window.webkitAudioContext;
@@ -1092,7 +1114,6 @@
     return audioCtx;
   }
 
-  // Two-Tone Success Chime
   function playSuccessBeep() {
     try {
       const ctx = getAudioContext();
@@ -1122,7 +1143,6 @@
     }
   }
 
-  // HIGH-PITCH STACCATO "TOO-TOT" NOTIFICATION (Error / Reject)
   function triggerErrorFeedback() {
     if (navigator.vibrate) {
       navigator.vibrate([180, 80, 180]);
@@ -1134,7 +1154,6 @@
 
       const now = ctx.currentTime;
 
-      // Pulse 1: "TOO" (1450 Hz)
       const osc1 = ctx.createOscillator();
       const gain1 = ctx.createGain();
       osc1.type = "square";
@@ -1149,7 +1168,6 @@
       osc1.start(now);
       osc1.stop(now + 0.10);
 
-      // Pulse 2: "TOT" (1100 Hz)
       const osc2 = ctx.createOscillator();
       const gain2 = ctx.createGain();
       osc2.type = "square";
@@ -1168,9 +1186,7 @@
     }
   }
 
-  /* ==========================================================
-     4. ATTENDANCE MODE SWITCHER (AM/PM IN & OUT)
-     ========================================================== */
+  /* 4. ATTENDANCE MODE SWITCHER */
   function setMode(mode) {
     currentMode = mode;
     
@@ -1188,9 +1204,7 @@
     el.style.color = color;
   }
 
-  /* ==========================================================
-     5. HARDWARE CAMERA ENGINE
-     ========================================================== */
+  /* 5. HARDWARE CAMERA ENGINE & "OFF CAM" FEATURE */
   async function initAndStartCamera() {
     getAudioContext();
     updateStatus("Requesting camera access...", "var(--primary)");
@@ -1259,6 +1273,7 @@
       document.getElementById("reticle").style.display = "block";
       document.getElementById("laser").style.display = "block";
       updateStatus("Camera Active. Point at QR code.", "var(--success)");
+      updateOffCamButton(true);
 
     } catch (err) {
       console.error("Camera Init Error:", err);
@@ -1267,13 +1282,57 @@
       if (err.name === "NotAllowedError" || err.name === "PermissionDeniedError") {
         msg = "Camera Permission Denied: Tap the lock icon in address bar to allow.";
       } else if (err.name === "NotReadableError") {
-        msg = "Camera in use: Close other camera apps, then tap Restart.";
+        msg = "Camera in use: Close other camera apps, then retry.";
       } else if (location.protocol !== "https:" && location.hostname !== "localhost") {
-        msg = "Use HTTPS or GitHub Pages for camera. Use '📁 Scan Photo' below as fallback!";
+        msg = "Use HTTPS or GitHub Pages for camera access.";
       }
 
       updateStatus(msg, "var(--danger)");
       triggerErrorFeedback();
+      updateOffCamButton(false);
+    }
+  }
+
+  /* OFF CAM FEATURE: Shuts down camera stream and puts scanner in standby */
+  async function stopCamera() {
+    if (html5QrCode && html5QrCode.isScanning) {
+      try {
+        await html5QrCode.stop();
+      } catch (e) {
+        console.warn("Error stopping camera:", e);
+      }
+    }
+    if (isTorchOn) {
+      isTorchOn = false;
+      const torchBtn = document.getElementById("torchBtn");
+      if (torchBtn) torchBtn.innerText = "🔦 Flash";
+    }
+    document.getElementById("permission-overlay").style.display = "flex";
+    document.getElementById("reticle").style.display = "none";
+    document.getElementById("laser").style.display = "none";
+    updateStatus("Camera is OFF. Tap 'Open Camera' to scan.", "var(--text-muted)");
+    updateOffCamButton(false);
+  }
+
+  function toggleOffCamera() {
+    if (html5QrCode && html5QrCode.isScanning) {
+      stopCamera();
+    } else {
+      initAndStartCamera();
+    }
+  }
+
+  function updateOffCamButton(isScanning) {
+    const btn = document.getElementById("offCamBtn");
+    if (!btn) return;
+    if (isScanning) {
+      btn.innerText = "⏹️ Off Cam";
+      btn.title = "Turn Off Camera";
+      btn.style.color = "var(--danger)";
+    } else {
+      btn.innerText = "📷 Start Cam";
+      btn.title = "Start Camera";
+      btn.style.color = "var(--text)";
     }
   }
 
@@ -1303,39 +1362,11 @@
     }
   }
 
-  async function scanImageFile(input) {
-    if (!input.files || input.files.length === 0) return;
-    const file = input.files[0];
-
-    updateStatus("Processing photo...", "var(--primary)");
-
-    try {
-      if (!html5QrCode) {
-        html5QrCode = new Html5Qrcode("reader");
-      }
-      const decoded = await html5QrCode.scanFile(file, true);
-      onScanSuccess(decoded);
-    } catch (err) {
-      console.error(err);
-      handleScanError("Could not read QR code from photo. Please retake clearly.");
-    } finally {
-      input.value = "";
-    }
-  }
-
-  /* ==========================================================
-     6. DATABASE LOOKUP & QR CODE SCANNING ENGINE
-     ========================================================== */
+  /* 6. DATABASE LOOKUP & QR SCANNING ENGINE */
   const studentNumRegex = /^202\d-4-\d{4}$/;
   const validPrograms = ["BSEE", "BSME", "BSCE", "BSPE"];
   const validYears = ["1ST", "2ND", "3RD", "4TH", "5TH"];
 
-  /**
-   * Scans can be:
-   * 1. Student Number only: "202#-4-####" -> looks up Database
-   * 2. Full Format: "Student-Number,Program,Year,Full-Name" -> verifies with Database
-   * 3. Legacy Format: "Program,Year,Full-Name,Student-Number" -> verifies with Database
-   */
   function onScanSuccess(decodedText) {
     if (isThrottled) return;
 
@@ -1347,19 +1378,19 @@
     let year = "";
     let fullName = "";
 
-    // Check Case 1: Student Number Only (e.g. 2023-4-0301)
+    // Case 1: Student Number Only (e.g. 2023-4-0301)
     if (studentNumRegex.test(raw)) {
       studentNumber = raw;
       const dbMatch = findStudentInDatabase(studentNumber);
       if (!dbMatch) {
-        handleScanError(`Student #${studentNumber} NOT in Database! Scan rejected.`);
+        handleScanError(`Student # ${studentNumber} NOT in Database! Scan rejected.`);
         return;
       }
       program = dbMatch.program;
       year = dbMatch.year;
       fullName = dbMatch.fullName;
     } 
-    // Check Case 2 & 3: Comma-Separated Values
+    // Case 2 & 3: Comma-Separated Values
     else if (raw.includes(",")) {
       const parts = raw.split(",").map(p => p.trim());
       if (parts.length !== 4) {
@@ -1367,7 +1398,6 @@
         return;
       }
 
-      // Determine which part is the student number
       if (studentNumRegex.test(parts[0])) {
         // Format: Student-Number, Program, Year, Full-Name
         [studentNumber, program, year, fullName] = parts;
@@ -1379,14 +1409,13 @@
         return;
       }
 
-      // VERIFY WITH DATABASE
+      // Verify with Database
       const dbMatch = findStudentInDatabase(studentNumber);
       if (!dbMatch) {
         handleScanError(`Student #${studentNumber} NOT in Database! Scan rejected.`);
         return;
       }
 
-      // If database has more canonical information, use it, or validate program & year
       if (!program || !validPrograms.includes(program)) program = dbMatch.program;
       if (!year || !validYears.includes(year)) year = dbMatch.year;
       if (!fullName) fullName = dbMatch.fullName;
@@ -1395,7 +1424,6 @@
       return;
     }
 
-    // Strict validation
     if (!validPrograms.includes(program)) {
       handleScanError(`Invalid Program: "${program}"`);
       return;
@@ -1409,8 +1437,8 @@
   }
 
   function findStudentInDatabase(studentNumber) {
-    const target = studentNumber.trim().toUpperCase();
-    return studentDatabase.find(s => (s.studentNumber || "").trim().toUpperCase() === target);
+    const target = (studentNumber || "").trim().toUpperCase();
+    return studentDatabaseMap.get(target) || null;
   }
 
   function processAttendanceRecord(program, year, fullName, studentNumber) {
@@ -1419,42 +1447,42 @@
     const scanDate = `${now.getFullYear()}/${pad(now.getMonth() + 1)}/${pad(now.getDate())}`;
     const scanTime = `${pad(now.getHours())}:${pad(now.getMinutes())}:${pad(now.getSeconds())}`;
     const eventName = (document.getElementById("eventName").value.trim() || "General-Event");
+    const cleanSno = studentNumber.replace(/^'/, "").trim().toUpperCase();
 
-    // STRICT DUPLICATE PREVENTION: No duplicate for same Student Number, Mode & Date
-    const alreadyScanned = attendanceList.some(
-      item => item["Student Number"] === studentNumber && item.Mode === currentMode && item.Date === scanDate
-    );
+    // STRICT DUPLICATE PREVENTION: Prevent duplicate with same Student Number, Mode & Date
+    const alreadyScanned = attendanceList.some(item => {
+      const existingSno = (item["Student Number"] || "").replace(/^'/, "").trim().toUpperCase();
+      return existingSno === cleanSno && item.Mode === currentMode && item.Date === scanDate;
+    });
 
     if (alreadyScanned) {
       handleScanError(`Already scanned for ${currentMode} today!`);
       return;
     }
 
-    // Sanitize string to prevent Excel Formula Injection
-    const sanitize = (str) => (/^[=+\-@]/.test(str) ? `'${str}` : str);
-
     const record = {
-      id: "rec_" + Date.now() + "_" + Math.floor(Math.random() * 1000),
+      id: "rec_" + Date.now() + "_" + Math.floor(Math.random() * 10000),
       Mode: currentMode,
-      "Student Number": sanitize(studentNumber),
-      "Full Name": sanitize(fullName),
-      "Program": sanitize(program),
-      "Year": sanitize(year),
+      "Student Number": sanitizeExcel(studentNumber),
+      "Full Name": sanitizeExcel(fullName),
+      "Program": sanitizeExcel(program),
+      "Year": sanitizeExcel(year),
       "Date": scanDate,
       "Time": scanTime,
       "Event": eventName,
-      synced: false // false = Red Minimalist Loading Spinner, true = Green Cloud
+      synced: false,
+      isSyncing: false
     };
 
     attendanceList.unshift(record);
     saveData();
     renderTable();
-    updateNetworkStatus();
+    updateNetworkStatusBannerOnly();
 
     playSuccessBeep();
     updateStatus(`✓ Logged: ${fullName} (${currentMode})`, "var(--success)");
 
-    // Auto-sync record to Google Sheet
+    // Single source of sync: dispatch direct record without triggering redundant bulk auto-sync
     sendRecordToGoogleSheet(record);
 
     isThrottled = true;
@@ -1476,15 +1504,13 @@
     }
   }
 
-  /* ==========================================================
-     7. GOOGLE SHEET SYNC ENGINE (ONLINE SYNC & QUEUE)
-     ========================================================== */
+  /* 7. GOOGLE SHEET SYNC ENGINE (RACE-CONDITION FREE DEDUPLICATION) */
   async function sendRecordToGoogleSheet(record) {
-    if (!scriptAppUrl || !navigator.onLine) {
-      // Stays in local queue with red minimalist loading circle
+    if (!scriptAppUrl || !navigator.onLine || record.synced || record.isSyncing) {
       return;
     }
 
+    record.isSyncing = true;
     try {
       const payload = {
         action: "logAttendance",
@@ -1500,8 +1526,6 @@
         }]
       };
 
-      // Send to Google Apps Script Web App
-      // Using mode: 'no-cors' allows submission without CORS blockages on static sites/GitHub Pages
       await fetch(scriptAppUrl, {
         method: "POST",
         mode: "no-cors",
@@ -1509,24 +1533,27 @@
         body: JSON.stringify(payload)
       });
 
-      // Mark this record as synced -> triggers Green Cloud
+      // Mark record as synced -> triggers Green Cloud
       record.synced = true;
+      record.isSyncing = false;
       saveData();
       renderTable();
-      updateNetworkStatus();
+      updateNetworkStatusBannerOnly();
 
     } catch (err) {
       console.warn("Failed to sync record to Google Sheet:", err);
-      // Keeps red loading circle for background retry
+      record.isSyncing = false;
     }
   }
 
   async function triggerAutoSync() {
     if (isSyncing || !scriptAppUrl || !navigator.onLine) return;
-    const unsynced = attendanceList.filter(item => !item.synced);
+    const unsynced = attendanceList.filter(item => !item.synced && !item.isSyncing);
     if (unsynced.length === 0) return;
 
     isSyncing = true;
+    unsynced.forEach(rec => rec.isSyncing = true);
+
     try {
       const payload = {
         action: "logAttendance",
@@ -1549,14 +1576,18 @@
         body: JSON.stringify(payload)
       });
 
-      // Mark all as synced
-      unsynced.forEach(rec => rec.synced = true);
+      // Mark batch as synced
+      unsynced.forEach(rec => {
+        rec.synced = true;
+        rec.isSyncing = false;
+      });
       saveData();
       renderTable();
-      updateNetworkStatus();
+      updateNetworkStatusBannerOnly();
       updateStatus("✓ All queued records synced to Google Sheet!", "var(--success)");
     } catch (err) {
       console.warn("Auto-sync error:", err);
+      unsynced.forEach(rec => rec.isSyncing = false);
     } finally {
       isSyncing = false;
     }
@@ -1575,9 +1606,7 @@
     alert("Sync complete!");
   }
 
-  /* ==========================================================
-     8. DATABASE CACHING & SYNC (doGet from Google Sheet)
-     ========================================================== */
+  /* 8. DATABASE CACHING & SYNC (doGet from Google Sheet) */
   async function syncDatabaseFromCloud() {
     if (!scriptAppUrl) {
       alert("Please enter and save your Google Apps Script Web App URL first.");
@@ -1602,6 +1631,7 @@
           fullName: (s.fullName || "").trim().toUpperCase()
         }));
 
+        rebuildStudentDbMap();
         localStorage.setItem("attendance_student_db", JSON.stringify(studentDatabase));
         updateDbBadges();
         updateStatus(`✓ Database Synced: ${studentDatabase.length} students loaded.`, "var(--success)");
@@ -1623,7 +1653,7 @@
     if (modalBadge) modalBadge.innerText = count;
   }
 
-  // Preload default sample database so scanning works immediately offline
+  // Preload sample database
   function loadSampleDatabase() {
     const samples = [
       { studentNumber: "2023-4-0301", program: "BSEE", year: "4TH", fullName: "RED C. MARQUEZ" },
@@ -1639,6 +1669,7 @@
     ];
 
     studentDatabase = samples;
+    rebuildStudentDbMap();
     localStorage.setItem("attendance_student_db", JSON.stringify(studentDatabase));
     updateDbBadges();
     alert(`Loaded ${samples.length} sample students into local database cache!`);
@@ -1655,12 +1686,10 @@
       const imported = [];
 
       lines.forEach((line, index) => {
-        // Skip header if detected
         if (index === 0 && (line.toLowerCase().includes("student") || line.toLowerCase().includes("program"))) return;
         
         const cols = line.split(",").map(c => c.replace(/^["']|["']$/g, "").trim());
         if (cols.length >= 4) {
-          // Check whether column 0 is student number or column 3
           let sno = "", prog = "", yr = "", fn = "";
           if (studentNumRegex.test(cols[0])) {
             [sno, prog, yr, fn] = cols;
@@ -1686,6 +1715,7 @@
 
       if (imported.length > 0) {
         studentDatabase = imported;
+        rebuildStudentDbMap();
         localStorage.setItem("attendance_student_db", JSON.stringify(studentDatabase));
         updateDbBadges();
         alert(`Successfully imported ${imported.length} student records into database cache!`);
@@ -1698,31 +1728,39 @@
     reader.readAsText(file);
   }
 
-  /* ==========================================================
-     9. TABLE RENDERING (Green Cloud vs Red Minimalist Spinner)
-     ========================================================== */
+  /* 9. TABLE RENDERING (XSS-PROTECTED & SCALED FOR 1,500+ STUDENTS) */
   function renderTable() {
     const tbody = document.getElementById("logsBody");
     const query = document.getElementById("searchInput").value.toLowerCase().trim();
     tbody.innerHTML = "";
 
     const counts = { BSEE: 0, BSME: 0, BSCE: 0, BSPE: 0 };
+    const filteredList = [];
 
-    attendanceList.forEach((item) => {
+    for (let i = 0; i < attendanceList.length; i++) {
+      const item = attendanceList[i];
       if (counts[item.Program] !== undefined) {
         counts[item.Program]++;
       }
 
-      const matches =
+      const matches = !query ||
         (item["Full Name"] || "").toLowerCase().includes(query) ||
         (item["Student Number"] || "").toLowerCase().includes(query) ||
         (item.Program || "").toLowerCase().includes(query) ||
         (item.Mode || "").toLowerCase().includes(query);
 
-      if (!matches && query !== "") return;
+      if (matches) {
+        filteredList.push(item);
+      }
+    }
 
-      // CLOUD STATUS INDICATOR:
-      // Synced = Green Cloud Icon | Not Synced = Red Circle Animation Loading Icon
+    // High performance DOM rendering: limit to top 60 recent scans for smooth 60fps camera on mobile
+    const MAX_DISPLAY = 60;
+    const displayList = filteredList.slice(0, MAX_DISPLAY);
+
+    const fragment = document.createDocumentFragment();
+
+    displayList.forEach(item => {
       const syncIndicator = item.synced ? `
         <span class="cloud-synced" title="Saved in Google Sheet">
           <svg width="20" height="20" viewBox="0 0 24 24" fill="currentColor">
@@ -1736,20 +1774,27 @@
       `;
 
       const tr = document.createElement("tr");
+      // Safe HTML escaping prevents DOM-based XSS
       tr.innerHTML = `
         <td class="sync-cell">${syncIndicator}</td>
-        <td><strong>${item.Mode}</strong></td>
-        <td>${item["Student Number"]}</td>
-        <td>${item["Full Name"]}</td>
-        <td>${item.Program}</td>
-        <td>${item.Year}</td>
-        <td>${item.Date}</td>
-        <td>${item.Time}</td>
+        <td><strong>${escapeHtml(item.Mode)}</strong></td>
+        <td>${escapeHtml(item["Student Number"])}</td>
+        <td>${escapeHtml(item["Full Name"])}</td>
+        <td>${escapeHtml(item.Program)}</td>
+        <td>${escapeHtml(item.Year)}</td>
+        <td>${escapeHtml(item.Date)}</td>
+        <td>${escapeHtml(item.Time)}</td>
       `;
-      tbody.appendChild(tr);
+      fragment.appendChild(tr);
     });
 
-    document.getElementById("recordCount").innerText = `Total: ${attendanceList.length}`;
+    tbody.appendChild(fragment);
+
+    const countText = filteredList.length > MAX_DISPLAY 
+      ? `Showing latest ${MAX_DISPLAY} of ${attendanceList.length}`
+      : `Total: ${attendanceList.length}`;
+    document.getElementById("recordCount").innerText = countText;
+
     document.getElementById("programChips").innerHTML = `
       <div class="chip">BSEE: ${counts.BSEE}</div>
       <div class="chip">BSME: ${counts.BSME}</div>
@@ -1758,69 +1803,17 @@
     `;
   }
 
-  /* ==========================================================
-     10. MANUAL ENTRY MODAL
-     ========================================================== */
-  function openManualModal() {
-    document.getElementById("manualModal").style.display = "flex";
-  }
-
-  function closeManualModal() {
-    document.getElementById("manualModal").style.display = "none";
-  }
-
-  function autoLookupStudent(sno) {
-    const raw = (sno || "").trim();
-    if (!studentNumRegex.test(raw)) return;
-
-    const match = findStudentInDatabase(raw);
-    if (match) {
-      if (match.program) document.getElementById("mProgram").value = match.program;
-      if (match.year) document.getElementById("mYear").value = match.year;
-      if (match.fullName) document.getElementById("mName").value = match.fullName;
-    }
-  }
-
-  function submitManualEntry() {
-    const sno = document.getElementById("mStudentNum").value.trim().toUpperCase();
-    const program = document.getElementById("mProgram").value.trim().toUpperCase();
-    const year = document.getElementById("mYear").value.trim().toUpperCase();
-    const name = document.getElementById("mName").value.trim().toUpperCase();
-
-    if (!studentNumRegex.test(sno)) {
-      alert("Student Number must match format: 202#-4-####");
-      return;
-    }
-
-    // Verify against Database
-    const dbMatch = findStudentInDatabase(sno);
-    if (!dbMatch) {
-      const proceed = confirm(`Student #${sno} is NOT in the database cache. Do you want to add anyway?`);
-      if (!proceed) return;
-    }
-
-    if (!name) {
-      alert("Please enter Full Name.");
-      return;
-    }
-
-    processAttendanceRecord(program, year, name, sno);
-    closeManualModal();
-    document.getElementById("mName").value = "";
-    document.getElementById("mStudentNum").value = "";
-  }
-
-  /* ==========================================================
-     11. CONFIGURATION MODAL (CLOUD & DATABASE)
-     ========================================================== */
+  /* 10. CONFIGURATION MODAL (WITH SCROLL LOCK & WHITE TEXT) */
   function openConfigModal() {
     document.getElementById("scriptUrlInput").value = scriptAppUrl;
     updateDbBadges();
     document.getElementById("configModal").style.display = "flex";
+    document.body.style.overflow = "hidden"; // Disable scroll when modal is open
   }
 
   function closeConfigModal() {
     document.getElementById("configModal").style.display = "none";
+    document.body.style.overflow = ""; // Re-enable background scrolling
   }
 
   function saveConfigSettings() {
@@ -1828,12 +1821,10 @@
     localStorage.setItem("attendance_script_url", scriptAppUrl);
     closeConfigModal();
     updateStatus("Google Apps Script URL saved.", "var(--success)");
-    updateNetworkStatus();
+    updateNetworkStatusBannerOnly();
   }
 
-  /* ==========================================================
-     12. EXPORT TO EXCEL (.xlsx)
-     ========================================================== */
+  /* 11. EXPORT TO EXCEL (.xlsx) - ORGANIZED ACCORDING TO USER'S ORDER */
   function exportToExcel() {
     if (attendanceList.length === 0) {
       alert("No attendance records to export.");
@@ -1841,11 +1832,13 @@
     }
 
     try {
+      // Organized in the requested column order:
+      // (Mode, Date, Time, Event, Student-Number, Program, Year, Full-Name, Synced-At)
       const exportData = attendanceList.map(item => ({
+        "Mode": item.Mode,
         "Date": item.Date,
         "Time": item.Time,
         "Event": item.Event || document.getElementById("eventName").value.trim() || "General-Event",
-        "Mode": item.Mode,
         "Student Number": item["Student Number"],
         "Program": item.Program,
         "Year": item.Year,
@@ -1858,10 +1851,10 @@
       XLSX.utils.book_append_sheet(workbook, worksheet, "Attendance");
 
       worksheet["!cols"] = [
+        { wch: 14 }, // Mode
         { wch: 14 }, // Date
         { wch: 12 }, // Time
         { wch: 22 }, // Event
-        { wch: 14 }, // Mode
         { wch: 18 }, // Student Number
         { wch: 10 }, // Program
         { wch: 8 },  // Year
@@ -1912,33 +1905,31 @@
       attendanceList = [];
       localStorage.removeItem("attendanceLogs");
       renderTable();
-      updateNetworkStatus();
+      updateNetworkStatusBannerOnly();
       updateStatus("All attendance records cleared.", "var(--text)");
     }
   }
 
-  /* ==========================================================
-     13. INITIALIZATION
-     ========================================================== */
+  /* 12. INITIALIZATION */
   window.addEventListener("DOMContentLoaded", () => {
     initTheme();
 
-    // Load initial sample database if empty
     if (!studentDatabase || studentDatabase.length === 0) {
       loadSampleDatabase();
     } else {
+      rebuildStudentDbMap();
       updateDbBadges();
     }
 
     renderTable();
-    updateNetworkStatus();
+    updateNetworkStatusBannerOnly();
 
     const savedEvent = localStorage.getItem("attendance_event_name");
     if (savedEvent) document.getElementById("eventName").value = savedEvent;
 
-    // Periodic network check & auto sync attempt every 30 seconds
+    // Periodic network check & queue update every 30s
     setInterval(() => {
-      updateNetworkStatus();
+      updateNetworkStatusBannerOnly();
     }, 30000);
   });
 </script>
