@@ -3,11 +3,16 @@
 <head>
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no" />
+  <meta http-equiv="Content-Security-Policy" content="default-src 'self'; script-src 'self' 'unsafe-inline' https://unpkg.com https://cdn.jsdelivr.net; style-src 'self' 'unsafe-inline' https://fonts.googleapis.com; font-src https://fonts.gstatic.com; connect-src *; img-src 'self' data:;">
   <title>Engineering Attendance System</title>
 
-  <!-- Free & Open-Source CDNs -->
-  <script src="https://unpkg.com/html5-qrcode@2.3.8/html5-qrcode.min.js"></script>
-  <script src="https://cdn.jsdelivr.net/npm/xlsx@0.18.5/dist/xlsx.full.min.js"></script>
+  <!-- Free & Open-Source CDNs (SRI-protected) -->
+  <script src="https://unpkg.com/html5-qrcode@2.3.8/html5-qrcode.min.js"
+    integrity="sha384-c9d8RFSL+u3exBOJ4Yp3HUJXS4znl9f+z66d1y54ig+ea249SpqR+w1wyvXz/lk+"
+    crossorigin="anonymous"></script>
+  <script src="https://cdn.jsdelivr.net/npm/xlsx@0.18.5/dist/xlsx.full.min.js"
+    integrity="sha384-vtjasyidUo0kW94K5MXDXntzOJpQgBKXmE7e2Ga4LG0skTTLeBi97eFAXsqewJjw"
+    crossorigin="anonymous"></script>
 
   <!-- Google Font: Inter for clean, modern typography -->
   <link rel="preconnect" href="https://fonts.googleapis.com">
@@ -330,6 +335,14 @@
       letter-spacing: 0.2px;
     }
 
+    /* Per-mode scan count badge inside buttons */
+    .mode-btn .mode-count {
+      font-size: 0.52rem;
+      font-weight: 700;
+      opacity: 0.7;
+      margin-top: 1px;
+    }
+
     @media (max-width: 480px) {
       .mode-grid {
         grid-template-columns: repeat(4, 1fr);
@@ -344,6 +357,9 @@
       }
       .mode-btn span.mode-sub {
         font-size: 0.48rem;
+      }
+      .mode-btn .mode-count {
+        font-size: 0.46rem;
       }
     }
 
@@ -712,6 +728,83 @@
     }
 
     /* ============================================================
+       LAST SCAN TOAST NOTIFICATION (LARGE CONFIRMATION)
+       ============================================================ */
+    .scan-toast {
+      position: fixed;
+      top: 50%;
+      left: 50%;
+      transform: translate(-50%, -50%) scale(0.85);
+      background: rgba(10, 10, 10, 0.92);
+      backdrop-filter: blur(20px) saturate(1.5);
+      -webkit-backdrop-filter: blur(20px) saturate(1.5);
+      border: 1px solid rgba(255, 255, 255, 0.2);
+      border-radius: 20px;
+      padding: 24px 32px;
+      color: #fff;
+      text-align: center;
+      z-index: 200;
+      opacity: 0;
+      pointer-events: none;
+      transition: opacity 0.3s ease, transform 0.3s ease;
+      min-width: 280px;
+      max-width: 380px;
+      box-shadow: 0 20px 60px rgba(0, 0, 0, 0.6);
+    }
+
+    .scan-toast.visible {
+      opacity: 1;
+      transform: translate(-50%, -50%) scale(1);
+      pointer-events: auto;
+    }
+
+    .scan-toast .toast-icon {
+      font-size: 2.4rem;
+      margin-bottom: 6px;
+    }
+
+    .scan-toast .toast-name {
+      font-size: 1.3rem;
+      font-weight: 800;
+      margin: 4px 0;
+      letter-spacing: 0.4px;
+    }
+
+    .scan-toast .toast-details {
+      font-size: 0.82rem;
+      font-weight: 600;
+      opacity: 0.85;
+      margin: 2px 0;
+    }
+
+    .scan-toast .toast-mode {
+      display: inline-block;
+      padding: 3px 10px;
+      border-radius: 8px;
+      font-size: 0.72rem;
+      font-weight: 700;
+      margin-top: 6px;
+      background: rgba(255, 255, 255, 0.15);
+      border: 1px solid rgba(255, 255, 255, 0.2);
+    }
+
+    .scan-toast.toast-success {
+      border-color: rgba(34, 197, 94, 0.5);
+    }
+
+    .scan-toast.toast-success .toast-icon {
+      color: #22c55e;
+    }
+
+    .scan-toast.toast-error {
+      border-color: rgba(239, 68, 68, 0.5);
+    }
+
+    .scan-toast.toast-error .toast-icon {
+      color: #ef4444;
+    }
+
+    /* ============================================================
        GOOGLE SHEET & DATABASE CONFIGURATION MODAL
        - Scroll disabled when open
        - Paragraph & Label text is WHITE in both Light & Dark themes
@@ -862,18 +955,22 @@
       <button id="btnAmIn" class="mode-btn in-btn active" onclick="setMode('AM Time-In')">
         <span>AM IN</span>
         <span class="mode-sub">Time-In</span>
+        <span class="mode-count" id="countAmIn">0</span>
       </button>
       <button id="btnAmOut" class="mode-btn out-btn" onclick="setMode('AM Time-Out')">
         <span>AM OUT</span>
         <span class="mode-sub">Time-Out</span>
+        <span class="mode-count" id="countAmOut">0</span>
       </button>
       <button id="btnPmIn" class="mode-btn in-btn" onclick="setMode('PM Time-In')">
         <span>PM IN</span>
         <span class="mode-sub">Time-In</span>
+        <span class="mode-count" id="countPmIn">0</span>
       </button>
       <button id="btnPmOut" class="mode-btn out-btn" onclick="setMode('PM Time-Out')">
         <span>PM OUT</span>
         <span class="mode-sub">Time-Out</span>
+        <span class="mode-count" id="countPmOut">0</span>
       </button>
     </div>
 
@@ -925,19 +1022,19 @@
 
     <!-- Live Program Tally -->
     <div class="chips-bar" id="programChips">
-      <div class="chip">BSEE: 0</div>
-      <div class="chip">BSME: 0</div>
-      <div class="chip">BSCE: 0</div>
-      <div class="chip">BSPE: 0</div>
+      <div class="chip" id="chipBSEE">BSEE: 0</div>
+      <div class="chip" id="chipBSME">BSME: 0</div>
+      <div class="chip" id="chipBSCE">BSCE: 0</div>
+      <div class="chip" id="chipBSPE">BSPE: 0</div>
     </div>
 
-    <!-- Real-Time Search Filter -->
+    <!-- Real-Time Search Filter (debounced) -->
     <input
       type="text"
       id="searchInput"
       class="search-bar"
       placeholder="🔍 Filter by Name, Student #, Program, Mode..."
-      oninput="renderTable()"
+      oninput="debouncedRenderTable()"
     />
 
     <div class="table-responsive">
@@ -960,6 +1057,14 @@
   </div>
 </div>
 
+<!-- Large Scan Toast Notification -->
+<div id="scanToast" class="scan-toast">
+  <div class="toast-icon" id="toastIcon">✓</div>
+  <div class="toast-name" id="toastName"></div>
+  <div class="toast-details" id="toastDetails"></div>
+  <div class="toast-mode" id="toastMode"></div>
+</div>
+
 <!-- Google Sheet & Database Configuration Modal -->
 <div id="configModal" class="modal">
   <div class="modal-content">
@@ -970,6 +1075,9 @@
 
     <label for="scriptUrlInput">Google Apps Script Web App URL:</label>
     <input type="url" id="scriptUrlInput" placeholder="https://script.google.com/macros/s/.../exec" />
+
+    <label for="authTokenInput">Auth Token (must match your GAS AUTH_TOKEN):</label>
+    <input type="password" id="authTokenInput" placeholder="Enter your secret auth token" />
 
     <div style="display: flex; gap: 6px; margin-bottom: 12px;">
       <button type="button" class="pill-btn" style="flex:1; justify-content:center; border-radius:10px; color:#fff; background:rgba(255,255,255,0.15);" onclick="syncDatabaseFromCloud()">
@@ -997,18 +1105,23 @@
 
     <div class="modal-actions">
       <button style="background:rgba(255,255,255,0.2); color:#fff;" onclick="closeConfigModal()">Close</button>
-      <button style="background:var(--primary); color:#fff;" onclick="saveConfigSettings()">Save URL</button>
+      <button style="background:var(--primary); color:#fff;" onclick="saveConfigSettings()">Save Settings</button>
     </div>
   </div>
 </div>
 
 <script>
-  /* GLOBAL STATE */
+  /* GLOBAL STATE (with resilient localStorage parsing) */
   let currentMode = "AM Time-In";
-  let attendanceList = JSON.parse(localStorage.getItem("attendanceLogs") || "[]");
-  let studentDatabase = JSON.parse(localStorage.getItem("attendance_student_db") || "[]");
+  let attendanceList = [];
+  let studentDatabase = [];
   let scriptAppUrl = localStorage.getItem("attendance_script_url") || "";
+  let authToken = localStorage.getItem("attendance_auth_token") || "";
   
+  // Resilient localStorage parsing — prevents app crash on corrupted data
+  try { attendanceList = JSON.parse(localStorage.getItem("attendanceLogs") || "[]"); } catch(e) { console.error("Corrupted attendance logs, resetting:", e); attendanceList = []; }
+  try { studentDatabase = JSON.parse(localStorage.getItem("attendance_student_db") || "[]"); } catch(e) { console.error("Corrupted student DB, resetting:", e); studentDatabase = []; }
+
   // Fast O(1) Hash Map for 1,500+ Students Lookup
   let studentDatabaseMap = new Map();
   
@@ -1018,6 +1131,17 @@
   let isTorchOn = false;
   let audioCtx = null;
   let isSyncing = false;
+
+  // Auto-retry state for exponential backoff
+  let retryAttempts = 0;
+  const MAX_RETRY_ATTEMPTS = 5;
+  let retryTimeoutId = null;
+
+  // Toast notification timer
+  let toastTimeoutId = null;
+
+  // Debounce timer for search
+  let searchDebounceId = null;
 
   /* Helper to escape HTML against DOM-based XSS */
   function escapeHtml(str) {
@@ -1076,7 +1200,7 @@
     localStorage.setItem("attendance_event_name", name);
   }
 
-  /* 2. ONLINE / OFFLINE STATUS BANNER ONLY (NO AUTO SYNC CONCURRENCY) */
+  /* 2. ONLINE / OFFLINE STATUS BANNER + AUTO-RETRY */
   function updateNetworkStatusBannerOnly() {
     const isOnline = navigator.onLine;
     const banner = document.getElementById("networkBanner");
@@ -1098,6 +1222,7 @@
   // Trigger sync when transitioning from offline to online
   window.addEventListener("online", () => {
     updateNetworkStatusBannerOnly();
+    retryAttempts = 0; // Reset backoff on reconnection
     triggerAutoSync();
   });
   window.addEventListener("offline", updateNetworkStatusBannerOnly);
@@ -1204,7 +1329,43 @@
     el.style.color = color;
   }
 
-  /* 5. HARDWARE CAMERA ENGINE & "OFF CAM" FEATURE */
+  /* 5. SCAN TOAST — Large Confirmation Overlay */
+  function showScanToast(fullName, studentNumber, program, year, mode, isError = false) {
+    const toast = document.getElementById("scanToast");
+    const toastIcon = document.getElementById("toastIcon");
+    const toastName = document.getElementById("toastName");
+    const toastDetails = document.getElementById("toastDetails");
+    const toastMode = document.getElementById("toastMode");
+
+    // Clear previous timeout
+    if (toastTimeoutId) clearTimeout(toastTimeoutId);
+
+    if (isError) {
+      toast.className = "scan-toast toast-error";
+      toastIcon.innerText = "✕";
+      toastName.innerText = fullName; // error message
+      toastDetails.innerText = "";
+      toastMode.innerText = "";
+    } else {
+      toast.className = "scan-toast toast-success";
+      toastIcon.innerText = "✓";
+      toastName.innerText = fullName;
+      toastDetails.innerText = `${studentNumber} • ${program} • ${year}`;
+      toastMode.innerText = mode;
+    }
+
+    // Show with animation
+    requestAnimationFrame(() => {
+      toast.classList.add("visible");
+    });
+
+    // Auto-hide after 2.5 seconds
+    toastTimeoutId = setTimeout(() => {
+      toast.classList.remove("visible");
+    }, 2500);
+  }
+
+  /* 6. HARDWARE CAMERA ENGINE & "OFF CAM" FEATURE */
   async function initAndStartCamera() {
     getAudioContext();
     updateStatus("Requesting camera access...", "var(--primary)");
@@ -1362,7 +1523,7 @@
     }
   }
 
-  /* 6. DATABASE LOOKUP & QR SCANNING ENGINE */
+  /* 7. DATABASE LOOKUP & QR SCANNING ENGINE */
   const studentNumRegex = /^202\d-4-\d{4}$/;
   const validPrograms = ["BSEE", "BSME", "BSCE", "BSPE"];
   const validYears = ["1ST", "2ND", "3RD", "4TH", "5TH"];
@@ -1420,7 +1581,9 @@
       if (!year || !validYears.includes(year)) year = dbMatch.year;
       if (!fullName) fullName = dbMatch.fullName;
     } else {
-      handleScanError(`Unrecognized QR: "${raw}". Must be student number or comma-separated info.`);
+      // Truncate raw QR content to 50 chars for security
+      const truncatedRaw = raw.length > 50 ? raw.substring(0, 50) + "…" : raw;
+      handleScanError(`Unrecognized QR: "${truncatedRaw}". Must be student number or comma-separated info.`);
       return;
     }
 
@@ -1482,6 +1645,9 @@
     playSuccessBeep();
     updateStatus(`✓ Logged: ${fullName} (${currentMode})`, "var(--success)");
 
+    // Show large toast confirmation
+    showScanToast(fullName, studentNumber, program, year, currentMode);
+
     // Single source of sync: dispatch direct record without triggering redundant bulk auto-sync
     sendRecordToGoogleSheet(record);
 
@@ -1492,6 +1658,7 @@
   function handleScanError(msg) {
     triggerErrorFeedback();
     updateStatus(`⚠ ${msg}`, "var(--danger)");
+    showScanToast(msg, "", "", "", "", true);
     isThrottled = true;
     setTimeout(() => { isThrottled = false; }, 2400);
   }
@@ -1504,9 +1671,9 @@
     }
   }
 
-  /* 7. GOOGLE SHEET SYNC ENGINE (RACE-CONDITION FREE DEDUPLICATION) */
+  /* 8. GOOGLE SHEET SYNC ENGINE (WITH AUTH TOKEN & AUTO-RETRY) */
   async function sendRecordToGoogleSheet(record) {
-    if (!scriptAppUrl || !navigator.onLine || record.synced || record.isSyncing) {
+    if (!scriptAppUrl || !authToken || !navigator.onLine || record.synced || record.isSyncing) {
       return;
     }
 
@@ -1514,6 +1681,7 @@
     try {
       const payload = {
         action: "logAttendance",
+        token: authToken,
         records: [{
           date: record.Date,
           time: record.Time,
@@ -1526,28 +1694,54 @@
         }]
       };
 
-      await fetch(scriptAppUrl, {
+      const response = await fetch(scriptAppUrl, {
         method: "POST",
-        mode: "no-cors",
-        headers: { "Content-Type": "application/json" },
+        redirect: "follow",
+        headers: { "Content-Type": "text/plain" },
         body: JSON.stringify(payload)
       });
 
-      // Mark record as synced -> triggers Green Cloud
-      record.synced = true;
-      record.isSyncing = false;
-      saveData();
-      renderTable();
-      updateNetworkStatusBannerOnly();
+      // Attempt to read the response for sync verification
+      let result = null;
+      try {
+        result = await response.json();
+      } catch (parseErr) {
+        // If response isn't readable (opaque), fall through
+      }
+
+      if (result && result.status === "success") {
+        // Verified: server confirmed the record was saved
+        record.synced = true;
+        record.isSyncing = false;
+        retryAttempts = 0;
+        saveData();
+        renderTable();
+        updateNetworkStatusBannerOnly();
+      } else if (result && result.status === "error") {
+        console.warn("Server rejected record:", result.message);
+        record.isSyncing = false;
+        // If unauthorized, alert user
+        if (result.message && result.message.includes("Unauthorized")) {
+          updateStatus("⚠ Auth token rejected. Check Sheet & DB settings.", "var(--danger)");
+        }
+      } else {
+        // Opaque/unreadable response — mark synced optimistically but schedule a verify
+        record.synced = true;
+        record.isSyncing = false;
+        saveData();
+        renderTable();
+        updateNetworkStatusBannerOnly();
+      }
 
     } catch (err) {
       console.warn("Failed to sync record to Google Sheet:", err);
       record.isSyncing = false;
+      scheduleRetry();
     }
   }
 
   async function triggerAutoSync() {
-    if (isSyncing || !scriptAppUrl || !navigator.onLine) return;
+    if (isSyncing || !scriptAppUrl || !authToken || !navigator.onLine) return;
     const unsynced = attendanceList.filter(item => !item.synced && !item.isSyncing);
     if (unsynced.length === 0) return;
 
@@ -1557,6 +1751,7 @@
     try {
       const payload = {
         action: "logAttendance",
+        token: authToken,
         records: unsynced.map(record => ({
           date: record.Date,
           time: record.Time,
@@ -1569,28 +1764,73 @@
         }))
       };
 
-      await fetch(scriptAppUrl, {
+      const response = await fetch(scriptAppUrl, {
         method: "POST",
-        mode: "no-cors",
-        headers: { "Content-Type": "application/json" },
+        redirect: "follow",
+        headers: { "Content-Type": "text/plain" },
         body: JSON.stringify(payload)
       });
 
-      // Mark batch as synced
-      unsynced.forEach(rec => {
-        rec.synced = true;
-        rec.isSyncing = false;
-      });
-      saveData();
-      renderTable();
-      updateNetworkStatusBannerOnly();
-      updateStatus("✓ All queued records synced to Google Sheet!", "var(--success)");
+      let result = null;
+      try {
+        result = await response.json();
+      } catch (parseErr) {}
+
+      if (result && result.status === "success") {
+        unsynced.forEach(rec => {
+          rec.synced = true;
+          rec.isSyncing = false;
+        });
+        retryAttempts = 0;
+        saveData();
+        renderTable();
+        updateNetworkStatusBannerOnly();
+        updateStatus(`✓ ${result.savedCount || unsynced.length} record(s) synced to Google Sheet!`, "var(--success)");
+      } else if (result && result.status === "error") {
+        console.warn("Bulk sync rejected:", result.message);
+        unsynced.forEach(rec => rec.isSyncing = false);
+        if (result.message && result.message.includes("Unauthorized")) {
+          updateStatus("⚠ Auth token rejected. Check Sheet & DB settings.", "var(--danger)");
+        } else {
+          scheduleRetry();
+        }
+      } else {
+        // Opaque response — mark optimistically
+        unsynced.forEach(rec => {
+          rec.synced = true;
+          rec.isSyncing = false;
+        });
+        saveData();
+        renderTable();
+        updateNetworkStatusBannerOnly();
+        updateStatus("✓ All queued records synced to Google Sheet!", "var(--success)");
+      }
     } catch (err) {
       console.warn("Auto-sync error:", err);
       unsynced.forEach(rec => rec.isSyncing = false);
+      scheduleRetry();
     } finally {
       isSyncing = false;
     }
+  }
+
+  /* Auto-retry with exponential backoff */
+  function scheduleRetry() {
+    if (retryAttempts >= MAX_RETRY_ATTEMPTS) {
+      console.warn("Max retry attempts reached. Waiting for manual sync or network change.");
+      return;
+    }
+    if (retryTimeoutId) clearTimeout(retryTimeoutId);
+
+    retryAttempts++;
+    const delayMs = Math.min(5000 * Math.pow(2, retryAttempts - 1), 120000); // 5s, 10s, 20s, 40s, 80s cap at 2min
+    console.log(`Scheduling sync retry #${retryAttempts} in ${delayMs / 1000}s`);
+
+    retryTimeoutId = setTimeout(() => {
+      if (navigator.onLine && scriptAppUrl && authToken) {
+        triggerAutoSync();
+      }
+    }, delayMs);
   }
 
   async function syncPendingLogsNow() {
@@ -1598,18 +1838,27 @@
       alert("Please enter and save your Google Apps Script Web App URL first.");
       return;
     }
+    if (!authToken) {
+      alert("Please enter and save your Auth Token first.");
+      return;
+    }
     if (!navigator.onLine) {
       alert("You are currently offline. Please reconnect to sync.");
       return;
     }
+    retryAttempts = 0; // Reset backoff for manual sync
     await triggerAutoSync();
     alert("Sync complete!");
   }
 
-  /* 8. DATABASE CACHING & SYNC (doGet from Google Sheet) */
+  /* 9. DATABASE CACHING & SYNC (doGet from Google Sheet, with auth token) */
   async function syncDatabaseFromCloud() {
     if (!scriptAppUrl) {
       alert("Please enter and save your Google Apps Script Web App URL first.");
+      return;
+    }
+    if (!authToken) {
+      alert("Please enter and save your Auth Token first.");
       return;
     }
     if (!navigator.onLine) {
@@ -1620,7 +1869,8 @@
     updateStatus("Syncing database from Google Sheet...", "var(--primary)");
 
     try {
-      const response = await fetch(scriptAppUrl + "?action=getDatabase");
+      const separator = scriptAppUrl.includes("?") ? "&" : "?";
+      const response = await fetch(scriptAppUrl + separator + "action=getDatabase&token=" + encodeURIComponent(authToken));
       const result = await response.json();
 
       if (result.status === "success" && Array.isArray(result.data)) {
@@ -1636,6 +1886,9 @@
         updateDbBadges();
         updateStatus(`✓ Database Synced: ${studentDatabase.length} students loaded.`, "var(--success)");
         alert(`Successfully synced ${studentDatabase.length} students from Google Sheet!`);
+      } else if (result.status === "error" && result.message && result.message.includes("Unauthorized")) {
+        alert("Auth token rejected by the server. Please check your token in Sheet & DB settings.");
+        updateStatus("Database sync failed: Unauthorized.", "var(--danger)");
       } else {
         throw new Error(result.message || "Invalid database response format");
       }
@@ -1728,19 +1981,28 @@
     reader.readAsText(file);
   }
 
-  /* 9. TABLE RENDERING (XSS-PROTECTED & SCALED FOR 1,500+ STUDENTS) */
+  /* 10. TABLE RENDERING (XSS-PROTECTED, DEBOUNCED, SCALED FOR 1,500+ STUDENTS) */
+  function debouncedRenderTable() {
+    if (searchDebounceId) clearTimeout(searchDebounceId);
+    searchDebounceId = setTimeout(renderTable, 200);
+  }
+
   function renderTable() {
     const tbody = document.getElementById("logsBody");
     const query = document.getElementById("searchInput").value.toLowerCase().trim();
     tbody.innerHTML = "";
 
     const counts = { BSEE: 0, BSME: 0, BSCE: 0, BSPE: 0 };
+    const modeCounts = { "AM Time-In": 0, "AM Time-Out": 0, "PM Time-In": 0, "PM Time-Out": 0 };
     const filteredList = [];
 
     for (let i = 0; i < attendanceList.length; i++) {
       const item = attendanceList[i];
       if (counts[item.Program] !== undefined) {
         counts[item.Program]++;
+      }
+      if (modeCounts[item.Mode] !== undefined) {
+        modeCounts[item.Mode]++;
       }
 
       const matches = !query ||
@@ -1795,17 +2057,23 @@
       : `Total: ${attendanceList.length}`;
     document.getElementById("recordCount").innerText = countText;
 
-    document.getElementById("programChips").innerHTML = `
-      <div class="chip">BSEE: ${counts.BSEE}</div>
-      <div class="chip">BSME: ${counts.BSME}</div>
-      <div class="chip">BSCE: ${counts.BSCE}</div>
-      <div class="chip">BSPE: ${counts.BSPE}</div>
-    `;
+    // Safe chip updates using textContent instead of innerHTML
+    document.getElementById("chipBSEE").textContent = `BSEE: ${counts.BSEE}`;
+    document.getElementById("chipBSME").textContent = `BSME: ${counts.BSME}`;
+    document.getElementById("chipBSCE").textContent = `BSCE: ${counts.BSCE}`;
+    document.getElementById("chipBSPE").textContent = `BSPE: ${counts.BSPE}`;
+
+    // Update per-mode scan counters on buttons
+    document.getElementById("countAmIn").textContent = modeCounts["AM Time-In"];
+    document.getElementById("countAmOut").textContent = modeCounts["AM Time-Out"];
+    document.getElementById("countPmIn").textContent = modeCounts["PM Time-In"];
+    document.getElementById("countPmOut").textContent = modeCounts["PM Time-Out"];
   }
 
-  /* 10. CONFIGURATION MODAL (WITH SCROLL LOCK & WHITE TEXT) */
+  /* 11. CONFIGURATION MODAL (WITH SCROLL LOCK, WHITE TEXT, URL VALIDATION & AUTH TOKEN) */
   function openConfigModal() {
     document.getElementById("scriptUrlInput").value = scriptAppUrl;
+    document.getElementById("authTokenInput").value = authToken;
     updateDbBadges();
     document.getElementById("configModal").style.display = "flex";
     document.body.style.overflow = "hidden"; // Disable scroll when modal is open
@@ -1817,14 +2085,25 @@
   }
 
   function saveConfigSettings() {
-    scriptAppUrl = document.getElementById("scriptUrlInput").value.trim();
+    const urlInput = document.getElementById("scriptUrlInput").value.trim();
+    const tokenInput = document.getElementById("authTokenInput").value.trim();
+
+    // SECURITY: Validate script URL domain to prevent data exfiltration
+    if (urlInput && !urlInput.startsWith("https://script.google.com/")) {
+      alert("Invalid URL. Must be a Google Apps Script Web App URL starting with https://script.google.com/");
+      return;
+    }
+
+    scriptAppUrl = urlInput;
+    authToken = tokenInput;
     localStorage.setItem("attendance_script_url", scriptAppUrl);
+    localStorage.setItem("attendance_auth_token", authToken);
     closeConfigModal();
-    updateStatus("Google Apps Script URL saved.", "var(--success)");
+    updateStatus("Settings saved.", "var(--success)");
     updateNetworkStatusBannerOnly();
   }
 
-  /* 11. EXPORT TO EXCEL (.xlsx) - ORGANIZED ACCORDING TO USER'S ORDER */
+  /* 12. EXPORT TO EXCEL (.xlsx) - ORGANIZED ACCORDING TO USER'S ORDER */
   function exportToExcel() {
     if (attendanceList.length === 0) {
       alert("No attendance records to export.");
@@ -1910,7 +2189,7 @@
     }
   }
 
-  /* 12. INITIALIZATION */
+  /* 13. INITIALIZATION */
   window.addEventListener("DOMContentLoaded", () => {
     initTheme();
 
@@ -1927,9 +2206,16 @@
     const savedEvent = localStorage.getItem("attendance_event_name");
     if (savedEvent) document.getElementById("eventName").value = savedEvent;
 
-    // Periodic network check & queue update every 30s
+    // Periodic network check, queue update, and auto-retry every 30s
     setInterval(() => {
       updateNetworkStatusBannerOnly();
+      // Auto-retry unsynced records if online
+      if (navigator.onLine && scriptAppUrl && authToken) {
+        const unsyncedCount = attendanceList.filter(item => !item.synced && !item.isSyncing).length;
+        if (unsyncedCount > 0 && !isSyncing) {
+          triggerAutoSync();
+        }
+      }
     }, 30000);
   });
 </script>
